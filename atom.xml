@@ -4,7 +4,7 @@
   <title><![CDATA[I left my leg in Jaglan Beta]]></title>
   <link href="http://jancorg.github.io/atom.xml" rel="self"/>
   <link href="http://jancorg.github.io/"/>
-  <updated>2015-01-01T21:29:04+01:00</updated>
+  <updated>2015-01-01T21:36:02+01:00</updated>
   <id>http://jancorg.github.io/</id>
   <author>
     <name><![CDATA[jancorg]]></name>
@@ -12,5 +12,173 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Linux Kernel Capabilities]]></title>
+    <link href="http://jancorg.github.io/blog/2015/01/01/linux-kernel-capabilities/"/>
+    <updated>2015-01-01T20:57:16+01:00</updated>
+    <id>http://jancorg.github.io/blog/2015/01/01/linux-kernel-capabilities</id>
+    <content type="html"><![CDATA[<p>Capabilities were created as an alternative to classical two level privilege system: root and user. They split a root acoount into their privileges. This way, linux kernel allows a process to perform certain root tipical tasks without giving a process full root privileges.</p>
+
+<p>A process (or better, a thread as the smaller unit a capability can be assigned to) can be granted with a given capability. Each capability is independent from each other.</p>
+
+<p>For instance, a user process with just CAP_NET_BIND_SERVICE capability can open ports bellow 1024, however it can not kill any process or use chroot.</p>
+
+<p>All linux kernel capabilities <a href="http://linux.die.net/man/7/capabilities">list</a> can be fond on man pages.</p>
+
+<p>Instead of checking effective UID of user, modern kernels checks for capabilities, so they allow the privileged operation if capability bit is set in the effective set.</p>
+
+<figure class='code'><figcaption><span>init_process_privileges</span><a href='https://github.com/torvalds/linux/blob/9a3c4145af32125c5ee39c0272662b47307a8323/kernel/cred.c'>link</a></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+</pre></td><td class='code'><pre><code class='c'><span class='line'><span class="k">struct</span> <span class="n">cred</span> <span class="n">init_cred</span> <span class="o">=</span> <span class="p">{</span>
+</span><span class='line'>  <span class="p">.</span><span class="n">usage</span>                  <span class="o">=</span> <span class="n">ATOMIC_INIT</span><span class="p">(</span><span class="mi">4</span><span class="p">),</span>
+</span><span class='line'><span class="cp">#ifdef CONFIG_DEBUG_CREDENTIALS</span>
+</span><span class='line'>  <span class="p">.</span><span class="n">subscribers</span>            <span class="o">=</span> <span class="n">ATOMIC_INIT</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span>
+</span><span class='line'>  <span class="p">.</span><span class="n">magic</span>                  <span class="o">=</span> <span class="n">CRED_MAGIC</span><span class="p">,</span>
+</span><span class='line'><span class="cp">#endif</span>
+</span><span class='line'>  <span class="p">.</span><span class="n">uid</span>                    <span class="o">=</span> <span class="n">GLOBAL_ROOT_UID</span><span class="p">,</span>
+</span><span class='line'>  <span class="p">.</span><span class="n">gid</span>                    <span class="o">=</span> <span class="n">GLOBAL_ROOT_GID</span><span class="p">,</span>
+</span><span class='line'>  <span class="p">.</span><span class="n">suid</span>                   <span class="o">=</span> <span class="n">GLOBAL_ROOT_UID</span><span class="p">,</span>
+</span><span class='line'>  <span class="p">.</span><span class="n">sgid</span>                   <span class="o">=</span> <span class="n">GLOBAL_ROOT_GID</span><span class="p">,</span>
+</span><span class='line'>  <span class="p">.</span><span class="n">euid</span>                   <span class="o">=</span> <span class="n">GLOBAL_ROOT_UID</span><span class="p">,</span>
+</span><span class='line'>  <span class="p">.</span><span class="n">egid</span>                   <span class="o">=</span> <span class="n">GLOBAL_ROOT_GID</span><span class="p">,</span>
+</span><span class='line'>  <span class="p">.</span><span class="n">fsuid</span>                  <span class="o">=</span> <span class="n">GLOBAL_ROOT_UID</span><span class="p">,</span>
+</span><span class='line'>  <span class="p">.</span><span class="n">fsgid</span>                  <span class="o">=</span> <span class="n">GLOBAL_ROOT_GID</span><span class="p">,</span>
+</span><span class='line'>  <span class="p">.</span><span class="n">securebits</span>             <span class="o">=</span> <span class="n">SECUREBITS_DEFAULT</span><span class="p">,</span>
+</span><span class='line'>  <span class="p">.</span><span class="n">cap_inheritable</span>        <span class="o">=</span> <span class="n">CAP_EMPTY_SET</span><span class="p">,</span>
+</span><span class='line'>  <span class="p">.</span><span class="n">cap_permitted</span>          <span class="o">=</span> <span class="n">CAP_FULL_SET</span><span class="p">,</span>
+</span><span class='line'>  <span class="p">.</span><span class="n">cap_effective</span>          <span class="o">=</span> <span class="n">CAP_FULL_SET</span><span class="p">,</span>
+</span><span class='line'>  <span class="p">.</span><span class="n">cap_bset</span>               <span class="o">=</span> <span class="n">CAP_FULL_SET</span><span class="p">,</span>
+</span><span class='line'>  <span class="p">.</span><span class="n">user</span>                   <span class="o">=</span> <span class="n">INIT_USER</span><span class="p">,</span>
+</span><span class='line'>  <span class="p">.</span><span class="n">user_ns</span>                <span class="o">=</span> <span class="o">&amp;</span><span class="n">init_user_ns</span><span class="p">,</span>
+</span><span class='line'>  <span class="p">.</span><span class="n">group_info</span>             <span class="o">=</span> <span class="o">&amp;</span><span class="n">init_groups</span><span class="p">,</span>
+</span><span class='line'><span class="p">};</span>
+</span><span class='line'><span class="p">}</span> <span class="kt">kernel_cap_t</span><span class="p">;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>linux_capabilities</p>
+
+<p>There are four sets of capabilities:
+effective: capabilities that a process is allowed.
+permitted: capabilities that a process is permited. This allows to enable, disable or drop capabilities.
+inheritable: capabilities that a process can give to another process called, for instance, by calling exec() system call.
+bounding set: Limit from capabilities can not be grown. They just can be dropped.</p>
+
+<p>Credentials, therefore, are mostly a set of uids/guis, management flags, capabilities, namaspaces and cgroups.</p>
+
+<p>As formerly happened with UID, GID and mode, capabilities are also part of VFS. They are called File Capabilities. They are store in f_cred struct.</p>
+
+<figure class='code'><figcaption><span>file_struct</span><a href='https://github.com/torvalds/linux/blob/603ba7e41bf5d405aba22294af5d075d8898176d/include/linux/fs.h'>link</a></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+</pre></td><td class='code'><pre><code class='c'><span class='line'><span class="k">struct</span> <span class="n">file</span> <span class="p">{</span>
+</span><span class='line'>  <span class="k">union</span> <span class="p">{</span>
+</span><span class='line'>      <span class="k">struct</span> <span class="n">llist_node</span> <span class="n">fu_llist</span><span class="p">;</span>
+</span><span class='line'>      <span class="k">struct</span> <span class="n">rcu_head</span>   <span class="n">fu_rcuhead</span><span class="p">;</span>
+</span><span class='line'>  <span class="p">}</span> <span class="n">f_u</span><span class="p">;</span>
+</span><span class='line'>  <span class="k">struct</span> <span class="n">path</span>                     <span class="n">f_path</span><span class="p">;</span>
+</span><span class='line'>  <span class="k">struct</span> <span class="n">inode</span>                    <span class="o">*</span><span class="n">f_inode</span><span class="p">;</span>    <span class="cm">/* cached value */</span>
+</span><span class='line'>  <span class="k">const</span> <span class="k">struct</span> <span class="n">file_operations</span>   <span class="o">*</span><span class="n">f_op</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="cm">/*</span>
+</span><span class='line'><span class="cm">  * Protects f_ep_links, f_flags.</span>
+</span><span class='line'><span class="cm">  * Must not be taken from IRQ context.</span>
+</span><span class='line'><span class="cm">  */</span>
+</span><span class='line'>  <span class="kt">spinlock_t</span>              <span class="n">f_lock</span><span class="p">;</span>
+</span><span class='line'>  <span class="kt">atomic_long_t</span>           <span class="n">f_count</span><span class="p">;</span>
+</span><span class='line'>  <span class="kt">unsigned</span> <span class="kt">int</span>            <span class="n">f_flags</span><span class="p">;</span>
+</span><span class='line'>  <span class="kt">fmode_t</span>                 <span class="n">f_mode</span><span class="p">;</span>
+</span><span class='line'>  <span class="k">struct</span> <span class="n">mutex</span>            <span class="n">f_pos_lock</span><span class="p">;</span>
+</span><span class='line'>  <span class="kt">loff_t</span>                  <span class="n">f_pos</span><span class="p">;</span>
+</span><span class='line'>  <span class="k">struct</span> <span class="n">fown_struct</span>      <span class="n">f_owner</span><span class="p">;</span>
+</span><span class='line'>  <span class="k">const</span> <span class="k">struct</span> <span class="n">cred</span>       <span class="o">*</span><span class="n">f_cred</span><span class="p">;</span>
+</span><span class='line'>  <span class="k">struct</span> <span class="n">file_ra_state</span>    <span class="n">f_ra</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="n">u64</span>                     <span class="n">f_version</span><span class="p">;</span>
+</span><span class='line'><span class="cp">#ifdef CONFIG_SECURITY</span>
+</span><span class='line'>  <span class="kt">void</span>                    <span class="o">*</span><span class="n">f_security</span><span class="p">;</span>
+</span><span class='line'><span class="cp">#endif</span>
+</span><span class='line'>  <span class="cm">/* needed for tty driver, and maybe others */</span>
+</span><span class='line'>  <span class="kt">void</span>                    <span class="o">*</span><span class="n">private_data</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="cp">#ifdef CONFIG_EPOLL</span>
+</span><span class='line'>  <span class="cm">/* Used by fs/eventpoll.c to link all the hooks to this file */</span>
+</span><span class='line'>  <span class="k">struct</span> <span class="n">list_head</span>        <span class="n">f_ep_links</span><span class="p">;</span>
+</span><span class='line'>  <span class="k">struct</span> <span class="n">list_head</span>        <span class="n">f_tfile_llink</span><span class="p">;</span>
+</span><span class='line'><span class="cp">#endif </span><span class="cm">/* #ifdef CONFIG_EPOLL */</span><span class="cp"></span>
+</span><span class='line'>  <span class="k">struct</span> <span class="n">address_space</span>    <span class="o">*</span><span class="n">f_mapping</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span> <span class="n">__attribute__</span><span class="p">((</span><span class="n">aligned</span><span class="p">(</span><span class="mi">4</span><span class="p">)));</span>  <span class="cm">/* lest something weird decides that 2 is OK */</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>This way, we can, for example ping some host on the internet using CAP_NET_RAW capability.</p>
+
+<p>Following is an example of setting a capability in command line interface.</p>
+
+<figure class='code'><figcaption><span>setting_beep_capabilities</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="c"># setcap cap_dac_override,cap_sys_tty_config+ep /usr/bin/beep</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p></p>
+]]></content>
+  </entry>
   
 </feed>
