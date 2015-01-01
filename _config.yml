@@ -2,12 +2,13 @@
 #      Main Configs       #
 # ----------------------- #
 
-url: http://yoursite.com
-title: My Octopress Blog
-subtitle: A blogging framework for hackers.
-author: Your Name
-simple_search: https://www.google.com/search
-description:
+url: http://jancorg.github.io
+title: I left my leg in Jaglan Beta
+subtitle: I'd far rather be happy than right any day.
+author: jancorg
+simple_search: https://duckduckgo.com/
+description: A tech blog or something else.
+#So long, and thanks for all the fish.
 
 # Default date format is "ordinal" (resulting in "July 22nd 2007")
 # You can customize the format as defined in
@@ -64,13 +65,13 @@ default_asides: [asides/recent_posts.html, asides/github.html, asides/delicious.
 # ----------------------- #
 
 # Github repositories
-github_user:
+github_user: 
 github_repo_count: 0
-github_show_profile_link: true
+github_show_profile_link: false
 github_skip_forks: true
 
 # Twitter
-twitter_user:
+twitter_user: jancorg
 twitter_tweet_button: true
 
 # Google +1
@@ -95,7 +96,7 @@ disqus_short_name:
 disqus_show_comment_count: false
 
 # Google Analytics
-google_analytics_tracking_id:
+google_analytics_tracking_id: UA-57753907-1
 
 # Facebook Like
-facebook_like: false
+facebook_like: true
