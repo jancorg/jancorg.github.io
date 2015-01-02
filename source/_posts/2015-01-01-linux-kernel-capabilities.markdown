@@ -10,7 +10,7 @@ Capabilities were created as an alternative to classical two level privilege sys
 
 A process (or better, a thread as the smaller unit a capability can be assigned to) can be granted with a given capability. Each capability is independent from each other.
 
-For instance, a user process with just CAP_NET_BIND_SERVICE capability can open ports bellow 1024, however it can not kill any process or use chroot.
+For instance, a user process with just `CAP_NET_BIND_SERVICE` capability can open ports bellow 1024, however it can not kill any process or use chroot.
 
 All linux kernel capabilities [list](http://linux.die.net/man/7/capabilities) can be found on man pages.
 
@@ -48,12 +48,12 @@ struct cred init_cred = {
 There are four sets of capabilities:
 effective: capabilities that a process is allowed.
 permitted: capabilities that a process is permited. This allows to enable, disable or drop capabilities.
-inheritable: capabilities that a process can give to another process called, for instance, by calling exec() system call.
+inheritable: capabilities that a process can give to another process called, for instance, by calling `exec()` system call.
 bounding set: Limit from capabilities can not be grown. They just can be dropped. 
 
 Credentials, therefore, are mostly a set of uids/guis, management flags, capabilities, namaspaces and cgroups.
 
-As formerly happened with UID, GID and mode, capabilities are also part of VFS. They are called File Capabilities. They are store in f_cred struct.
+As formerly happened with UID, GID and mode, capabilities are also part of VFS. They are called File Capabilities. They are store in `f_cred` struct.
 
 ``` c file_struct https://github.com/torvalds/linux/blob/603ba7e41bf5d405aba22294af5d075d8898176d/include/linux/fs.h
 struct file {
@@ -95,7 +95,7 @@ struct file {
 } __attribute__((aligned(4)));	/* lest something weird decides that 2 is OK */
 ```
 
-This way, we can, for example ping some host on the internet using CAP_NET_RAW capability.
+This way, we can, for example ping some host on the internet using `CAP_NET_RAW` capability.
 
 Following is an example of setting a capability in command line interface.
 

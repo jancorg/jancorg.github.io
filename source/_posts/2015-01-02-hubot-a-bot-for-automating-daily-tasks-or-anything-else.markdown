@@ -9,9 +9,9 @@ categories: [ hubot, devops, git, slack, docker ]
 
 > Hubot is your company's robot. Install him in your company to dramatically improve and reduce employee efficiency.
 
-In other words, [hubot](https://hubot.github.com/) is a chat bot crafted by github team that can run custom writen scritps. This allow us to automatize any kind of tasks like merging branchs, deploying releases, inform (it listen on a port), etc. It has a lot of adapters (where it reads from and writes to), even shell, so we can enjoy it company's almost everywhere.
+In other words, [hubot](https://hubot.github.com/) is a chat bot crafted by github team that can run custom written scritps. This allow us to automatize any kind of tasks like merging branchs, deploying releases, inform (it listen on a port), etc. It has a lot of adapters (where it reads from and writes to), even shell, so we can enjoy it company's almost everywhere.
 
-It is writen in [coffescript](http://coffeescript.org/) and run with nodejs.
+It is written in [coffescript](http://coffeescript.org/) and ran with nodejs.
 
 ## Hubot setup
 
@@ -45,9 +45,9 @@ EXPOSE 8080
 
 Build an image with docker or just use the commands for testing it. Nodejs setup instructions can be found on [joyent's nodejs repo](https://github.com/joyent/node/wiki/Installing-Node.js-via-package-manager)
 
-This also install [slack adapter](https://github.com/slackhq/hubot-slack) and [hubot-scripts](https://github.com/github/hubot-scripts) and [githubot](https://github.com/iangreenleaf/githubot) npm packages, so you can figure out how next steps will be.
+This also installs [slack adapter](https://github.com/slackhq/hubot-slack) and [hubot-scripts](https://github.com/github/hubot-scripts) and [githubot](https://github.com/iangreenleaf/githubot) npm packages, so you can figure out how next steps will be.
 
-Well, let me introduce you to Marvin, my hubot instance, named like Hithicker's guide to galaxy robot.
+Let me introduce you to Marvin, my hubot instance, named like Hitchhicker's guide to galaxy assistant robot.
 
 ``` text 
                     _____________________________  
@@ -70,7 +70,7 @@ marvin> marvin: the rules
 2. A robot must obey any orders given to it by human beings, except where such orders would conflict with the First Law.
 3. A robot must protect its own existence as long as such protection does not conflict with the First or Second Law.
 ```
-
+[Janky](https://github.com/github/janky) is a hibhub project than implements CI on top Jenkins and Hubot. Chatops term used to refer chat based deployments and monitoring.  
 
 ## Github integration
 
@@ -114,7 +114,7 @@ It seems to work, and since it is using [github merge API](https://developer.git
 
 ## Slack integration
 
-I have chosen slack as default adapter, since it is chat tool we are using at office, however default one is [campfire](https://github.com/github/hubot/tree/master/src/adapters).
+I have chosen slack as default adapter since it is chat tool we are using at office. However default one is [campfire](https://github.com/github/hubot/tree/master/src/adapters).
 
 An organization, if you already don't have one, needs to be created on slack. You can do it on sign up process.
 When this is done, just configure integrations and look for hubot there. You will get a token and even you can set a custom avatar for you shinny bot.
