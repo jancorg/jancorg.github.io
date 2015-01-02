@@ -4,7 +4,7 @@
   <title><![CDATA[I left my leg in Jaglan Beta]]></title>
   <link href="http://jancorg.github.io/atom.xml" rel="self"/>
   <link href="http://jancorg.github.io/"/>
-  <updated>2015-01-02T21:48:02+01:00</updated>
+  <updated>2015-01-02T22:33:58+01:00</updated>
   <id>http://jancorg.github.io/</id>
   <author>
     <name><![CDATA[jancorg]]></name>
@@ -20,9 +20,9 @@
     <id>http://jancorg.github.io/blog/2015/01/02/hubot-a-bot-for-automating-daily-tasks-or-anything-else</id>
     <content type="html"><![CDATA[<blockquote><p>Hubot is your company&rsquo;s robot. Install him in your company to dramatically improve and reduce employee efficiency.</p></blockquote>
 
-<p>In other words, <a href="https://hubot.github.com/">hubot</a> is a chat bot crafted by github team that can run custom writen scritps. This allow us to automatize any kind of tasks like merging branchs, deploying releases, inform (it listen on a port), etc. It has a lot of adapters (where it reads from and writes to), even shell, so we can enjoy it company&rsquo;s almost everywhere.</p>
+<p>In other words, <a href="https://hubot.github.com/">hubot</a> is a chat bot crafted by github team that can run custom written scritps. This allow us to automatize any kind of tasks like merging branchs, deploying releases, inform (it listen on a port), etc. It has a lot of adapters (where it reads from and writes to), even shell, so we can enjoy it company&rsquo;s almost everywhere.</p>
 
-<p>It is writen in <a href="http://coffeescript.org/">coffescript</a> and run with nodejs.</p>
+<p>It is written in <a href="http://coffeescript.org/">coffescript</a> and ran with nodejs.</p>
 
 <h2>Hubot setup</h2>
 
@@ -79,9 +79,9 @@
 
 <p>Build an image with docker or just use the commands for testing it. Nodejs setup instructions can be found on <a href="https://github.com/joyent/node/wiki/Installing-Node.js-via-package-manager">joyent&rsquo;s nodejs repo</a></p>
 
-<p>This also install <a href="https://github.com/slackhq/hubot-slack">slack adapter</a> and <a href="https://github.com/github/hubot-scripts">hubot-scripts</a> and <a href="https://github.com/iangreenleaf/githubot">githubot</a> npm packages, so you can figure out how next steps will be.</p>
+<p>This also installs <a href="https://github.com/slackhq/hubot-slack">slack adapter</a> and <a href="https://github.com/github/hubot-scripts">hubot-scripts</a> and <a href="https://github.com/iangreenleaf/githubot">githubot</a> npm packages, so you can figure out how next steps will be.</p>
 
-<p>Well, let me introduce you to Marvin, my hubot instance, named like Hithicker&rsquo;s guide to galaxy robot.</p>
+<p>Let me introduce you to Marvin, my hubot instance, named like Hitchhicker&rsquo;s guide to galaxy assistant robot.</p>
 
 <figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -123,6 +123,8 @@
 </span><span class='line'>3. A robot must protect its own existence as long as such protection does not conflict with the First or Second Law.
 </span></code></pre></td></tr></table></div></figure>
 
+
+<p><a href="https://github.com/github/janky">Janky</a> is a hibhub project than implements CI on top Jenkins and Hubot. Chatops term used to refer chat based deployments and monitoring.</p>
 
 <h2>Github integration</h2>
 
@@ -183,7 +185,7 @@ This time I have tested <a href="https://github.com/github/hubot-scripts/blob/ma
 
 <h2>Slack integration</h2>
 
-<p>I have chosen slack as default adapter, since it is chat tool we are using at office, however default one is <a href="https://github.com/github/hubot/tree/master/src/adapters">campfire</a>.</p>
+<p>I have chosen slack as default adapter since it is chat tool we are using at office. However default one is <a href="https://github.com/github/hubot/tree/master/src/adapters">campfire</a>.</p>
 
 <p>An organization, if you already don&rsquo;t have one, needs to be created on slack. You can do it on sign up process.
 When this is done, just configure integrations and look for hubot there. You will get a token and even you can set a custom avatar for you shinny bot.
@@ -215,7 +217,7 @@ Make this token availabe as environment varaible, and&hellip; that&rsquo;s it.</
 
 <p>A process (or better, a thread as the smaller unit a capability can be assigned to) can be granted with a given capability. Each capability is independent from each other.</p>
 
-<p>For instance, a user process with just CAP_NET_BIND_SERVICE capability can open ports bellow 1024, however it can not kill any process or use chroot.</p>
+<p>For instance, a user process with just <code>CAP_NET_BIND_SERVICE</code> capability can open ports bellow 1024, however it can not kill any process or use chroot.</p>
 
 <p>All linux kernel capabilities <a href="http://linux.die.net/man/7/capabilities">list</a> can be found on man pages.</p>
 
@@ -277,12 +279,12 @@ Make this token availabe as environment varaible, and&hellip; that&rsquo;s it.</
 <p>There are four sets of capabilities:
 effective: capabilities that a process is allowed.
 permitted: capabilities that a process is permited. This allows to enable, disable or drop capabilities.
-inheritable: capabilities that a process can give to another process called, for instance, by calling exec() system call.
+inheritable: capabilities that a process can give to another process called, for instance, by calling <code>exec()</code> system call.
 bounding set: Limit from capabilities can not be grown. They just can be dropped.</p>
 
 <p>Credentials, therefore, are mostly a set of uids/guis, management flags, capabilities, namaspaces and cgroups.</p>
 
-<p>As formerly happened with UID, GID and mode, capabilities are also part of VFS. They are called File Capabilities. They are store in f_cred struct.</p>
+<p>As formerly happened with UID, GID and mode, capabilities are also part of VFS. They are called File Capabilities. They are store in <code>f_cred</code> struct.</p>
 
 <figure class='code'><figcaption><span>file_struct</span><a href='https://github.com/torvalds/linux/blob/603ba7e41bf5d405aba22294af5d075d8898176d/include/linux/fs.h'>link</a></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -361,7 +363,7 @@ bounding set: Limit from capabilities can not be grown. They just can be dropped
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>This way, we can, for example ping some host on the internet using CAP_NET_RAW capability.</p>
+<p>This way, we can, for example ping some host on the internet using <code>CAP_NET_RAW</code> capability.</p>
 
 <p>Following is an example of setting a capability in command line interface.</p>
 
