@@ -102,7 +102,7 @@
 
 <p>For instance, a user process with just CAP_NET_BIND_SERVICE capability can open ports bellow 1024, however it can not kill any process or use chroot.</p>
 
-<p>All linux kernel capabilities <a href="http://linux.die.net/man/7/capabilities">list</a> can be fond on man pages.</p>
+<p>All linux kernel capabilities <a href="http://linux.die.net/man/7/capabilities">list</a> can be found on man pages.</p>
 
 <p>Instead of checking effective UID of user, modern kernels checks for capabilities, so they allow the privileged operation if capability bit is set in the effective set.</p>
 
@@ -157,7 +157,7 @@
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>linux_capabilities</p>
+<p><a href="https://github.com/torvalds/linux/blob/9a3c4145af32125c5ee39c0272662b47307a8323/include/uapi/linux/capability.h">linux capabilities</a></p>
 
 <p>There are four sets of capabilities:
 effective: capabilities that a process is allowed.
@@ -297,6 +297,8 @@ bounding set: Limit from capabilities can not be grown. They just can be dropped
     <p class="meta">
       
       
+        <a class="basic-alignment right" href="/blog/2015/01/02/hubot-a-bot-for-automating-daily-tasks-or-anything-else/" title="Next Post: Hubot: A bot for automating daily tasks or anything else">Hubot: A bot for automating daily tasks or anything else &raquo;</a>
+      
     </p>
   </footer>
 </article>
@@ -308,6 +310,10 @@ bounding set: Limit from capabilities can not be grown. They just can be dropped
     <section>
   <h1>Recent Posts</h1>
   <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2015/01/02/hubot-a-bot-for-automating-daily-tasks-or-anything-else/">Hubot: A Bot for Automating Daily Tasks or Anything Else</a>
+      </li>
     
       <li class="post">
         <a href="/blog/2015/01/01/linux-kernel-capabilities/">Linux Kernel Capabilities</a>
