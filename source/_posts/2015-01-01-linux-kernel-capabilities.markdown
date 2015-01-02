@@ -12,7 +12,7 @@ A process (or better, a thread as the smaller unit a capability can be assigned 
 
 For instance, a user process with just CAP_NET_BIND_SERVICE capability can open ports bellow 1024, however it can not kill any process or use chroot.
 
-All linux kernel capabilities [list](http://linux.die.net/man/7/capabilities) can be fond on man pages.
+All linux kernel capabilities [list](http://linux.die.net/man/7/capabilities) can be found on man pages.
 
 Instead of checking effective UID of user, modern kernels checks for capabilities, so they allow the privileged operation if capability bit is set in the effective set.
 
@@ -41,7 +41,9 @@ struct cred init_cred = {
 	.group_info             = &init_groups,
 };
 } kernel_cap_t;
-```linux_capabilities
+```
+
+[linux capabilities](https://github.com/torvalds/linux/blob/9a3c4145af32125c5ee39c0272662b47307a8323/include/uapi/linux/capability.h)
 
 There are four sets of capabilities:
 effective: capabilities that a process is allowed.
