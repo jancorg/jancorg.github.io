@@ -6,13 +6,13 @@ comments: true
 categories: [ devops, linux, kernel, capabilities ] 
 ---
 
-Capabilities were created as an alternative to classical two level privilege system: root and user. They split a root acoount into their privileges. This way, linux kernel allows a process to perform certain root tipical tasks without giving a process full root privileges.
+Capabilities were created as an alternative to classical two level privilege system: root and user. They split a root acount into their privileges. This way, linux kernel allows a process to perform certain root tipical tasks without giving a process full root privileges.
 
 A process (or better, a thread as the smaller unit a capability can be assigned to) can be granted with a given capability. Each capability is independent from each other.
 
 For instance, a user process with just `CAP_NET_BIND_SERVICE` capability can open ports bellow 1024, however it can not kill any process or use chroot.
 
-All linux kernel capabilities [list](http://linux.die.net/man/7/capabilities) can be found on man pages.
+All linux kernel capabilities list can be found on [man pages](http://linux.die.net/man/7/capabilities) as well as [code](https://github.com/torvalds/linux/blob/9a3c4145af32125c5ee39c0272662b47307a8323/include/uapi/linux/capability.h).
 
 Instead of checking effective UID of user, modern kernels checks for capabilities, so they allow the privileged operation if capability bit is set in the effective set.
 
@@ -43,13 +43,11 @@ struct cred init_cred = {
 } kernel_cap_t;
 ```
 
-[linux capabilities](https://github.com/torvalds/linux/blob/9a3c4145af32125c5ee39c0272662b47307a8323/include/uapi/linux/capability.h)
-
 There are four sets of capabilities:
-effective: capabilities that a process is allowed.
-permitted: capabilities that a process is permited. This allows to enable, disable or drop capabilities.
-inheritable: capabilities that a process can give to another process called, for instance, by calling `exec()` system call.
-bounding set: Limit from capabilities can not be grown. They just can be dropped. 
+- effective: capabilities that a process is allowed.
+- permitted: capabilities that a process is permited. This allows to enable, disable or drop capabilities.
+- inheritable: capabilities that a process can give to another process called, for instance, by calling `exec()` system call.
+- bounding set: Limit from capabilities can not be grown. They just can be dropped. 
 
 Credentials, therefore, are mostly a set of uids/guis, management flags, capabilities, namaspaces and cgroups.
 
@@ -99,7 +97,7 @@ This way, we can, for example ping some host on the internet using `CAP_NET_RAW`
 
 Following is an example of setting a capability in command line interface.
 
-``` sh setting_beep_capabilities
+``` sh 
 # setcap cap_dac_override,cap_sys_tty_config+ep /usr/bin/beep
 ``` 
 
