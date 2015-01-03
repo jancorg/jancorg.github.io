@@ -1,0 +1,327 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>LibContainer Overview - I left my leg in Jaglan Beta</title>
+  <meta name="author" content="jancorg">
+
+  
+  <meta name="description" content="Libcontainer is now the default docker execution environment. It is driver (named native) and a library. Or in other words, it is a replacement ( &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://jancorg.github.io/blog/2015/01/03/libcontainer-overview">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/atom.xml" rel="alternate" title="I left my leg in Jaglan Beta" type="application/atom+xml">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="/javascripts/libs/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="//fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="//fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-57753907-1']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">I left my leg in Jaglan Beta</a></h1>
+  
+    <h2>I&#8217;d far rather be happy than right any day.</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="https://duckduckgo.com/" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="sitesearch" value="jancorg.github.io">
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">LibContainer Overview</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2015-01-03T18:14:14+01:00'><span class='date'><span class='date-month'>Jan</span> <span class='date-day'>3</span><span class='date-suffix'>rd</span>, <span class='date-year'>2015</span></span> <span class='time'>6:14 pm</span></time>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>Libcontainer is now the default docker execution environment. It is driver (named native) and a library.</p>
+
+<p>Or in other words, it is a replacement (since version 0.9) for formerly LXC execution environment (that can be easily brought back using <code>-e</code> switch).</p>
+
+<p>This library is developed by docker.io, written in go and C/C++, in order to support a wider range of isolation technologies. It also can be used in python through python bindings.</p>
+
+<p><img src="http://blog.docker.com/wp-content/uploads/2014/03/docker-execdriver-diagram.png" alt="docker execdriver" /></p>
+
+<p>It is meant to be a cross-system abstraction layer being an attempt to standarize the way apps are packed up, delivered, and run in isolation.</p>
+
+<p>Making libcontainer a stand alone project, makes possible to other game players to adopt it. Google, parallels (openvz), redhat, ubuntu (lxc). are also contributing to this project.</p>
+
+<p><img src="http://1.bp.blogspot.com/-sxNaakTEBlg/U6Bbtglx00I/AAAAAAAAAcw/xgreTVZP4F4/s1600/libcontainer+intro.png" alt="libcontainer_place" /></p>
+
+<p>This way, container features available in linux kernel API are provided as a unique library in a consistent way. LibContainer addresses the problem of having an unique kernel API and several implementations. (call them, LXC, libvirt, lmctfy, &hellip;)</p>
+
+<blockquote><p>Libcontainer enables containers to work with Linux namespaces, control groups, capabilities, AppArmor, security profiles, network interfaces and firewalling rules in a consistent and predictable way.</p></blockquote>
+
+<p>Currently, docker can support these kernel features out-of-the-box, since it no longer depends on LXC.</p>
+
+<p>It introduces a new container specification as we can see <a href="https://github.com/docker/libcontainer/blob/4940cee052ece5a8b2ea477699e7bb232de1e1f8/SPEC.md">here</a></p>
+
+<blockquote><p> It includes namespaces, standard filesystem setup, a default Linux capability set, and information about resource reservations. It also has information about any populated environment settings for the processes running inside a container.</p></blockquote>
+
+<p>Let`s see a little example of how it was replaced on docker code.</p>
+
+<p><code>nsinit</code> and <code>nsenter</code> are the user-land tools that now are needed in order to replace <code>lxc-*</code> user-land tools.
+<code>nsinit</code> is part of libcontainer package and it is meant to load a <a href="https://github.com/docker/libcontainer/blob/master/sample_configs/minimal.json">config json file</a>. It replaces <code>lxc-start</code>.</p>
+
+<p><code>nsenter</code> replaces <code>lxc-attach</code> and it is not part of libcontainer package, but it is part of <code>util-linux</code> <a href="https://www.kernel.org/pub/linux/utils/util-linux/">package</a>.</p>
+
+<p>When formerly we ran &ldquo;docker run &hellip;&rdquo;, (by default) it called <code>lxc-start</code> to run the container.</p>
+
+<figure class='code'><figcaption><span>lxc-start</span><a href='https://github.com/docker/docker/blob/17cacf3326edde6d177e12132f74fc0174bda1d2/daemon/execdriver/lxc/driver.go'>link</a></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='go'><span class='line'><span class="nx">params</span> <span class="o">:=</span> <span class="p">[]</span><span class="kt">string</span><span class="p">{</span>
+</span><span class='line'>  <span class="s">&quot;lxc-start&quot;</span><span class="p">,</span>
+</span><span class='line'>  <span class="s">&quot;-n&quot;</span><span class="p">,</span> <span class="nx">c</span><span class="p">.</span><span class="nx">ID</span><span class="p">,</span>
+</span><span class='line'>  <span class="s">&quot;-f&quot;</span><span class="p">,</span> <span class="nx">configPath</span><span class="p">,</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Currently, native execdriver is called.</p>
+
+<figure class='code'><figcaption><span>native_exec_driver</span><a href='https://github.com/docker/docker/blob/17cacf3326edde6d177e12132f74fc0174bda1d2/daemon/execdriver/native/driver.go'>link</a></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='go'><span class='line'><span class="kd">func</span> <span class="p">(</span><span class="nx">d</span> <span class="o">*</span><span class="nx">driver</span><span class="p">)</span> <span class="nx">Run</span><span class="p">(</span><span class="nx">c</span> <span class="o">*</span><span class="nx">execdriver</span><span class="p">.</span><span class="nx">Command</span><span class="p">,</span> <span class="nx">pipes</span> <span class="o">*</span><span class="nx">execdriver</span><span class="p">.</span><span class="nx">Pipes</span><span class="p">,</span> <span class="nx">startCallback</span> <span class="nx">execdriver</span><span class="p">.</span><span class="nx">StartCallback</span><span class="p">)</span> <span class="p">(</span><span class="nx">execdriver</span><span class="p">.</span><span class="nx">ExitStatus</span><span class="p">,</span> <span class="kt">error</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>  <span class="c1">// take the Command and populate the libcontainer.Config from it</span>
+</span><span class='line'>  <span class="nx">container</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">d</span><span class="p">.</span><span class="nx">createContainer</span><span class="p">(</span><span class="nx">c</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<figure class='code'><figcaption><span>native_syscalls</span><a href='https://github.com/docker/libcontainer/blob/1597c68f7b941fd97881155d7f077852e2914e7b/namespaces/utils.go'>link</a></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class='go'><span class='line'><span class="kd">var</span> <span class="nx">namespaceInfo</span> <span class="p">=</span> <span class="kd">map</span><span class="p">[</span><span class="nx">libcontainer</span><span class="p">.</span><span class="nx">NamespaceType</span><span class="p">]</span><span class="kt">int</span><span class="p">{</span>
+</span><span class='line'>  <span class="nx">libcontainer</span><span class="p">.</span><span class="nx">NEWNET</span><span class="p">:</span>  <span class="nx">syscall</span><span class="p">.</span><span class="nx">CLONE_NEWNET</span><span class="p">,</span>
+</span><span class='line'>  <span class="nx">libcontainer</span><span class="p">.</span><span class="nx">NEWNS</span><span class="p">:</span>   <span class="nx">syscall</span><span class="p">.</span><span class="nx">CLONE_NEWNS</span><span class="p">,</span>
+</span><span class='line'>  <span class="nx">libcontainer</span><span class="p">.</span><span class="nx">NEWUSER</span><span class="p">:</span> <span class="nx">syscall</span><span class="p">.</span><span class="nx">CLONE_NEWUSER</span><span class="p">,</span>
+</span><span class='line'>  <span class="nx">libcontainer</span><span class="p">.</span><span class="nx">NEWIPC</span><span class="p">:</span>  <span class="nx">syscall</span><span class="p">.</span><span class="nx">CLONE_NEWIPC</span><span class="p">,</span>
+</span><span class='line'>  <span class="nx">libcontainer</span><span class="p">.</span><span class="nx">NEWUTS</span><span class="p">:</span>  <span class="nx">syscall</span><span class="p">.</span><span class="nx">CLONE_NEWUTS</span><span class="p">,</span>
+</span><span class='line'>  <span class="nx">libcontainer</span><span class="p">.</span><span class="nx">NEWPID</span><span class="p">:</span>  <span class="nx">syscall</span><span class="p">.</span><span class="nx">CLONE_NEWPID</span><span class="p">,</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>General go syscalls can be found <a href="http://golang.org/pkg/syscall/">here.</a>. These ones used above are Linux especific.</p>
+
+<p>Master Libcontainer branch supports right now <a href="https://github.com/docker/docker/tree/master/daemon/execdriver">lxc and native</a> execdrivers. Hence it means that it can only used in linux for now.</p>
+
+<figure class='code'><figcaption><span>supported_exec_drivers</span><a href='https://github.com/docker/docker/blob/master/daemon/execdriver/execdrivers/execdrivers.go'>link</a></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class='go'><span class='line'><span class="kn">package</span> <span class="nx">execdrivers</span>
+</span><span class='line'>
+</span><span class='line'><span class="kn">import</span> <span class="p">(</span>
+</span><span class='line'><span class="o">...</span>
+</span><span class='line'>  <span class="s">&quot;github.com/docker/docker/daemon/execdriver/lxc&quot;</span>
+</span><span class='line'>  <span class="s">&quot;github.com/docker/docker/daemon/execdriver/native&quot;</span>
+</span><span class='line'><span class="o">...</span>
+</span><span class='line'><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p></p>
+
+<p>Other systems, like FreeBSD, implements &lsquo;containers&rsquo; using Jails. It is an older concept, and some people note that it could not be as sofisticated as linux one is.</p>
+
+<p><a href="https://github.com/kzys/docker/commit/f8c4d49fda9eb7e35c88532c174fa8dca9d831ba">Here</a> is as an example of an execution driver in development for FreeBSD Jails. Well, it is an execution driver for FreeBSD, therefore not using libcontainer.</p>
+
+<p>Unfortunately, FreeBSD (and others flavours) mention on docker &amp; libcontainer are only for go language.</p>
+
+<p>A full list of OS level virtualization implementations can be found  on <a href="http://en.wikipedia.org/wiki/Operating_system%E2%80%93level_virtualization#Implementations">wikipedia</a></p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">jancorg</span></span>
+
+      
+
+
+
+
+<time class='entry-date' datetime='2015-01-03T18:14:14+01:00'><span class='date'><span class='date-month'>Jan</span> <span class='date-day'>3</span><span class='date-suffix'>rd</span>, <span class='date-year'>2015</span></span> <span class='time'>6:14 pm</span></time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/devops/'>devops</a>, <a class='category' href='/blog/categories/docker/'>docker</a>, <a class='category' href='/blog/categories/libcontainer/'>libcontainer</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://jancorg.github.io/blog/2015/01/03/libcontainer-overview/" data-via="jancorg" data-counturl="http://jancorg.github.io/blog/2015/01/03/libcontainer-overview/" >Tweet</a>
+  
+  
+  
+    <div class="fb-like" data-send="true" data-width="450" data-show-faces="false"></div>
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2015/01/02/hubot-a-bot-for-automating-daily-tasks-or-anything-else/" title="Previous Post: Hubot: A bot for automating daily tasks or anything else">&laquo; Hubot: A bot for automating daily tasks or anything else</a>
+      
+      
+    </p>
+  </footer>
+</article>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2015/01/03/libcontainer-overview/">LibContainer Overview</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2015/01/02/hubot-a-bot-for-automating-daily-tasks-or-anything-else/">Hubot: A Bot for Automating Daily Tasks or Anything Else</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2015/01/01/linux-kernel-capabilities/">Linux Kernel Capabilities</a>
+      </li>
+    
+  </ul>
+</section>
+
+
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2015 - jancorg -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+
+
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) {return;}
+  js = d.createElement(s); js.id = id; js.async = true;
+  js.src = "//connect.facebook.net/en_US/all.js#appId=212934732101925&xfbml=1";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = '//platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

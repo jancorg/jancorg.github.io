@@ -4,7 +4,7 @@
   <title><![CDATA[I left my leg in Jaglan Beta]]></title>
   <link href="http://jancorg.github.io/atom.xml" rel="self"/>
   <link href="http://jancorg.github.io/"/>
-  <updated>2015-01-02T22:33:58+01:00</updated>
+  <updated>2015-01-03T20:37:39+01:00</updated>
   <id>http://jancorg.github.io/</id>
   <author>
     <name><![CDATA[jancorg]]></name>
@@ -14,19 +14,137 @@
 
   
   <entry>
+    <title type="html"><![CDATA[LibContainer Overview]]></title>
+    <link href="http://jancorg.github.io/blog/2015/01/03/libcontainer-overview/"/>
+    <updated>2015-01-03T18:14:14+01:00</updated>
+    <id>http://jancorg.github.io/blog/2015/01/03/libcontainer-overview</id>
+    <content type="html"><![CDATA[<p>Libcontainer is now the default docker execution environment. It is driver (named native) and a library.</p>
+
+<p>Or in other words, it is a replacement (since version 0.9) for formerly LXC execution environment (that can be easily brought back using <code>-e</code> switch).</p>
+
+<p>This library is developed by docker.io, written in go and C/C++, in order to support a wider range of isolation technologies. It also can be used in python through python bindings.</p>
+
+<p><img src="http://blog.docker.com/wp-content/uploads/2014/03/docker-execdriver-diagram.png" alt="docker execdriver" /></p>
+
+<p>It is meant to be a cross-system abstraction layer being an attempt to standarize the way apps are packed up, delivered, and run in isolation.</p>
+
+<p>Making libcontainer a stand alone project, makes possible to other game players to adopt it. Google, parallels (openvz), redhat, ubuntu (lxc). are also contributing to this project.</p>
+
+<p><img src="http://1.bp.blogspot.com/-sxNaakTEBlg/U6Bbtglx00I/AAAAAAAAAcw/xgreTVZP4F4/s1600/libcontainer+intro.png" alt="libcontainer_place" /></p>
+
+<p>This way, container features available in linux kernel API are provided as a unique library in a consistent way. LibContainer addresses the problem of having an unique kernel API and several implementations. (call them, LXC, libvirt, lmctfy, &hellip;)</p>
+
+<blockquote><p>Libcontainer enables containers to work with Linux namespaces, control groups, capabilities, AppArmor, security profiles, network interfaces and firewalling rules in a consistent and predictable way.</p></blockquote>
+
+<p>Currently, docker can support these kernel features out-of-the-box, since it no longer depends on LXC.</p>
+
+<p>It introduces a new container specification as we can see <a href="https://github.com/docker/libcontainer/blob/4940cee052ece5a8b2ea477699e7bb232de1e1f8/SPEC.md">here</a></p>
+
+<blockquote><p> It includes namespaces, standard filesystem setup, a default Linux capability set, and information about resource reservations. It also has information about any populated environment settings for the processes running inside a container.</p></blockquote>
+
+<p>Let`s see a little example of how it was replaced on docker code.</p>
+
+<p><code>nsinit</code> and <code>nsenter</code> are the user-land tools that now are needed in order to replace <code>lxc-*</code> user-land tools.
+<code>nsinit</code> is part of libcontainer package and it is meant to load a <a href="https://github.com/docker/libcontainer/blob/master/sample_configs/minimal.json">config json file</a>. It replaces <code>lxc-start</code>.</p>
+
+<p><code>nsenter</code> replaces <code>lxc-attach</code> and it is not part of libcontainer package, but it is part of <code>util-linux</code> <a href="https://www.kernel.org/pub/linux/utils/util-linux/">package</a>.</p>
+
+<p>When formerly we ran &ldquo;docker run &hellip;&rdquo;, (by default) it called <code>lxc-start</code> to run the container.</p>
+
+<figure class='code'><figcaption><span>lxc-start</span><a href='https://github.com/docker/docker/blob/17cacf3326edde6d177e12132f74fc0174bda1d2/daemon/execdriver/lxc/driver.go'>link</a></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='go'><span class='line'><span class="nx">params</span> <span class="o">:=</span> <span class="p">[]</span><span class="kt">string</span><span class="p">{</span>
+</span><span class='line'>  <span class="s">&quot;lxc-start&quot;</span><span class="p">,</span>
+</span><span class='line'>  <span class="s">&quot;-n&quot;</span><span class="p">,</span> <span class="nx">c</span><span class="p">.</span><span class="nx">ID</span><span class="p">,</span>
+</span><span class='line'>  <span class="s">&quot;-f&quot;</span><span class="p">,</span> <span class="nx">configPath</span><span class="p">,</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Currently, native execdriver is called.</p>
+
+<figure class='code'><figcaption><span>native_exec_driver</span><a href='https://github.com/docker/docker/blob/17cacf3326edde6d177e12132f74fc0174bda1d2/daemon/execdriver/native/driver.go'>link</a></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='go'><span class='line'><span class="kd">func</span> <span class="p">(</span><span class="nx">d</span> <span class="o">*</span><span class="nx">driver</span><span class="p">)</span> <span class="nx">Run</span><span class="p">(</span><span class="nx">c</span> <span class="o">*</span><span class="nx">execdriver</span><span class="p">.</span><span class="nx">Command</span><span class="p">,</span> <span class="nx">pipes</span> <span class="o">*</span><span class="nx">execdriver</span><span class="p">.</span><span class="nx">Pipes</span><span class="p">,</span> <span class="nx">startCallback</span> <span class="nx">execdriver</span><span class="p">.</span><span class="nx">StartCallback</span><span class="p">)</span> <span class="p">(</span><span class="nx">execdriver</span><span class="p">.</span><span class="nx">ExitStatus</span><span class="p">,</span> <span class="kt">error</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>  <span class="c1">// take the Command and populate the libcontainer.Config from it</span>
+</span><span class='line'>  <span class="nx">container</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">d</span><span class="p">.</span><span class="nx">createContainer</span><span class="p">(</span><span class="nx">c</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<figure class='code'><figcaption><span>native_syscalls</span><a href='https://github.com/docker/libcontainer/blob/1597c68f7b941fd97881155d7f077852e2914e7b/namespaces/utils.go'>link</a></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class='go'><span class='line'><span class="kd">var</span> <span class="nx">namespaceInfo</span> <span class="p">=</span> <span class="kd">map</span><span class="p">[</span><span class="nx">libcontainer</span><span class="p">.</span><span class="nx">NamespaceType</span><span class="p">]</span><span class="kt">int</span><span class="p">{</span>
+</span><span class='line'>  <span class="nx">libcontainer</span><span class="p">.</span><span class="nx">NEWNET</span><span class="p">:</span>  <span class="nx">syscall</span><span class="p">.</span><span class="nx">CLONE_NEWNET</span><span class="p">,</span>
+</span><span class='line'>  <span class="nx">libcontainer</span><span class="p">.</span><span class="nx">NEWNS</span><span class="p">:</span>   <span class="nx">syscall</span><span class="p">.</span><span class="nx">CLONE_NEWNS</span><span class="p">,</span>
+</span><span class='line'>  <span class="nx">libcontainer</span><span class="p">.</span><span class="nx">NEWUSER</span><span class="p">:</span> <span class="nx">syscall</span><span class="p">.</span><span class="nx">CLONE_NEWUSER</span><span class="p">,</span>
+</span><span class='line'>  <span class="nx">libcontainer</span><span class="p">.</span><span class="nx">NEWIPC</span><span class="p">:</span>  <span class="nx">syscall</span><span class="p">.</span><span class="nx">CLONE_NEWIPC</span><span class="p">,</span>
+</span><span class='line'>  <span class="nx">libcontainer</span><span class="p">.</span><span class="nx">NEWUTS</span><span class="p">:</span>  <span class="nx">syscall</span><span class="p">.</span><span class="nx">CLONE_NEWUTS</span><span class="p">,</span>
+</span><span class='line'>  <span class="nx">libcontainer</span><span class="p">.</span><span class="nx">NEWPID</span><span class="p">:</span>  <span class="nx">syscall</span><span class="p">.</span><span class="nx">CLONE_NEWPID</span><span class="p">,</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>General go syscalls can be found <a href="http://golang.org/pkg/syscall/">here.</a>. These ones used above are Linux especific.</p>
+
+<p>Master Libcontainer branch supports right now <a href="https://github.com/docker/docker/tree/master/daemon/execdriver">lxc and native</a> execdrivers. Hence it means that it can only used in linux for now.</p>
+
+<figure class='code'><figcaption><span>supported_exec_drivers</span><a href='https://github.com/docker/docker/blob/master/daemon/execdriver/execdrivers/execdrivers.go'>link</a></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class='go'><span class='line'><span class="kn">package</span> <span class="nx">execdrivers</span>
+</span><span class='line'>
+</span><span class='line'><span class="kn">import</span> <span class="p">(</span>
+</span><span class='line'><span class="o">...</span>
+</span><span class='line'>  <span class="s">&quot;github.com/docker/docker/daemon/execdriver/lxc&quot;</span>
+</span><span class='line'>  <span class="s">&quot;github.com/docker/docker/daemon/execdriver/native&quot;</span>
+</span><span class='line'><span class="o">...</span>
+</span><span class='line'><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p></p>
+
+<p>Other systems, like FreeBSD, implements &lsquo;containers&rsquo; using Jails. It is an older concept, and some people note that it could not be as sofisticated as linux one is.</p>
+
+<p><a href="https://github.com/kzys/docker/commit/f8c4d49fda9eb7e35c88532c174fa8dca9d831ba">Here</a> is as an example of an execution driver in development for FreeBSD Jails. Well, it is an execution driver for FreeBSD, therefore not using libcontainer.</p>
+
+<p>Unfortunately, FreeBSD (and others flavours) mention on docker &amp; libcontainer are only for go language.</p>
+
+<p>A full list of OS level virtualization implementations can be found  on <a href="http://en.wikipedia.org/wiki/Operating_system%E2%80%93level_virtualization#Implementations">wikipedia</a></p>
+]]></content>
+  </entry>
+  
+  <entry>
     <title type="html"><![CDATA[Hubot: A Bot for Automating Daily Tasks or Anything Else]]></title>
     <link href="http://jancorg.github.io/blog/2015/01/02/hubot-a-bot-for-automating-daily-tasks-or-anything-else/"/>
     <updated>2015-01-02T19:23:50+01:00</updated>
     <id>http://jancorg.github.io/blog/2015/01/02/hubot-a-bot-for-automating-daily-tasks-or-anything-else</id>
     <content type="html"><![CDATA[<blockquote><p>Hubot is your company&rsquo;s robot. Install him in your company to dramatically improve and reduce employee efficiency.</p></blockquote>
 
-<p>In other words, <a href="https://hubot.github.com/">hubot</a> is a chat bot crafted by github team that can run custom written scritps. This allow us to automatize any kind of tasks like merging branchs, deploying releases, inform (it listen on a port), etc. It has a lot of adapters (where it reads from and writes to), even shell, so we can enjoy it company&rsquo;s almost everywhere.</p>
+<p>In other words, <a href="https://hubot.github.com/">hubot</a> is a chat bot crafted by github team that can run custom written scritps. This allow us to automatize any kind of tasks like merging branchs, deploying releases, do monitoring queries, inform (it listen on a port), etc. It has a lot of adapters (where it reads from and writes to), even shell, so we can enjoy its company almost everywhere.</p>
 
 <p>It is written in <a href="http://coffeescript.org/">coffescript</a> and ran with nodejs.</p>
 
 <h2>Hubot setup</h2>
 
-<p>To ease this process, we are going to setup and deploy it with docker. Following Dockerfile allowed me to run and test Hubot.</p>
+<p>In order to ease this process, we are going to setup and deploy it with docker. Following Dockerfile allowed me to run and test Hubot.</p>
 
 <figure class='code'><figcaption><span>hubot_dockerfile</span><a href='https://gist.github.com/jancorg/2d14912f35f756b97912/'>link</a></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -61,12 +179,12 @@
 </span><span class='line'>ENV HOME /home/marvin
 </span><span class='line'># variables needed by hubot scripts
 </span><span class='line'>ADD env-vars.sh /home/marvin/.profile
-</span><span class='line'>RUN choown marvin /home/marvin/.profile
+</span><span class='line'>RUN chown marvin /home/marvin/.profile
 </span><span class='line'>
 </span><span class='line'>USER marvin
 </span><span class='line'>WORDIR /home/marvin
 </span><span class='line'>RUN echo n | yo hubot --defaults
-</span><span class='line'>RUN npm install hubot-slack hubot-scripts githubot --save
+</span><span class='line'>RUN npm installº hubot-slack hubot-scripts githubot --save
 </span><span class='line'>
 </span><span class='line'># enable plugins
 </span><span class='line'>RUN echo [ \&#39;github-merge.coffee\&#39; ] &gt; hubot-scripts.json
@@ -77,9 +195,9 @@
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>Build an image with docker or just use the commands for testing it. Nodejs setup instructions can be found on <a href="https://github.com/joyent/node/wiki/Installing-Node.js-via-package-manager">joyent&rsquo;s nodejs repo</a></p>
+<p>Build an image with <code>docker build -t cname/hubot .</code> or just use the commands for testing it. Nodejs setup instructions can be found on <a href="https://github.com/joyent/node/wiki/Installing-Node.js-via-package-manager">joyent&rsquo;s nodejs repo</a></p>
 
-<p>This also installs <a href="https://github.com/slackhq/hubot-slack">slack adapter</a> and <a href="https://github.com/github/hubot-scripts">hubot-scripts</a> and <a href="https://github.com/iangreenleaf/githubot">githubot</a> npm packages, so you can figure out how next steps will be.</p>
+<p>This also installs <a href="https://github.com/slackhq/hubot-slack">slack adapter</a>, <a href="https://github.com/github/hubot-scripts">hubot-scripts</a> and <a href="https://github.com/iangreenleaf/githubot">githubot</a> npm packages, hence you can figure out how next steps will be.</p>
 
 <p>Let me introduce you to Marvin, my hubot instance, named like Hitchhicker&rsquo;s guide to galaxy assistant robot.</p>
 
@@ -102,7 +220,7 @@
 <span class='line-number'>17</span>
 <span class='line-number'>18</span>
 <span class='line-number'>19</span>
-</pre></td><td class='code'><pre><code class='text'><span class='line'>                _____________________________
+</pre></td><td class='code'><pre><code class='text'><span class='line'>                 _____________________________
 </span><span class='line'>                /                             \
 </span><span class='line'>   //\              |      Extracting input for    |
 </span><span class='line'>  ////\    _____    |   self-replication process   |
@@ -124,12 +242,12 @@
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p><a href="https://github.com/github/janky">Janky</a> is a hibhub project than implements CI on top Jenkins and Hubot. Chatops term used to refer chat based deployments and monitoring.</p>
+<p><a href="https://github.com/github/janky">Janky</a> is a hithub project that implements CI on top Jenkins and Hubot. Chatops term is used to refer chat based deployments and monitoring.</p>
 
 <h2>Github integration</h2>
 
-<p>Of the things I found interesting using hubot for is ease merging and deploy process.
-In this article I am just going to treat merging as as example, but concepts shown here could be easily used for integrate it with jenkins or any other tools.</p>
+<p>One of the things I found interesting using hubot for is easy merging and deploy process.
+In this article I am just going to treat merging as as example, but concepts shown here could be easily used for integrating it with jenkins or any other tools.</p>
 
 <p>We can find some git related scripts under scripts folder in <a href="https://github.com/github/hubot-scripts">hubot-scripts</a> github project.
 This time I have tested <a href="https://github.com/github/hubot-scripts/blob/master/src/scripts/github-merge.coffee">github-merge.coffee</a> plugin. It uses <a href="https://github.com/iangreenleaf/githubot">githubot</a> project for github API access.</p>
@@ -179,13 +297,13 @@ This time I have tested <a href="https://github.com/github/hubot-scripts/blob/ma
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p><img src="images/2015-01-02-hubot/hubot_merged_branch.png" alt="hubot_merged_branch" /></p>
+<p><img src="http://jancorg.github.io/images/2015-01-02-hubot/hubot_merged_branch.png" alt="hubot_merged_branch" /></p>
 
 <p>It seems to work, and since it is using <a href="https://developer.github.com/v3/repos/merging/">github merge API</a> we are not messing any branch up.</p>
 
 <h2>Slack integration</h2>
 
-<p>I have chosen slack as default adapter since it is chat tool we are using at office. However default one is <a href="https://github.com/github/hubot/tree/master/src/adapters">campfire</a>.</p>
+<p>I have chosen slack as default adapter since it is chat tool we are using at office. Hubots default one is <a href="https://github.com/github/hubot/tree/master/src/adapters">campfire</a>.</p>
 
 <p>An organization, if you already don&rsquo;t have one, needs to be created on slack. You can do it on sign up process.
 When this is done, just configure integrations and look for hubot there. You will get a token and even you can set a custom avatar for you shinny bot.
@@ -200,9 +318,9 @@ Make this token availabe as environment varaible, and&hellip; that&rsquo;s it.</
 
 <p>Let&rsquo;s see the results.</p>
 
-<p><img src="images/2015-01-02-hubot/hubot_joins_channel.png" alt="joins_channel" /></p>
+<p><img src="http://jancorg.github.io/images/2015-01-02-hubot/hubot_joins_channel.png" alt="joins_channel" /></p>
 
-<p><img src="images/2015-01-02-hubot/hubot_merge_and_plugin_example.png" alt="hubot_merge_and_plugin_example" /></p>
+<p><img src="http://jancorg.github.io/images/2015-01-02-hubot/hubot_merge_and_plugin_example.png" alt="hubot_merge_and_plugin_example" /></p>
 
 <p>Enjoy your bot!</p>
 ]]></content>
@@ -213,13 +331,13 @@ Make this token availabe as environment varaible, and&hellip; that&rsquo;s it.</
     <link href="http://jancorg.github.io/blog/2015/01/01/linux-kernel-capabilities/"/>
     <updated>2015-01-01T20:57:16+01:00</updated>
     <id>http://jancorg.github.io/blog/2015/01/01/linux-kernel-capabilities</id>
-    <content type="html"><![CDATA[<p>Capabilities were created as an alternative to classical two level privilege system: root and user. They split a root acoount into their privileges. This way, linux kernel allows a process to perform certain root tipical tasks without giving a process full root privileges.</p>
+    <content type="html"><![CDATA[<p>Capabilities were created as an alternative to classical two level privilege system: root and user. They split a root acount into their privileges. This way, linux kernel allows a process to perform certain root tipical tasks without giving a process full root privileges.</p>
 
 <p>A process (or better, a thread as the smaller unit a capability can be assigned to) can be granted with a given capability. Each capability is independent from each other.</p>
 
 <p>For instance, a user process with just <code>CAP_NET_BIND_SERVICE</code> capability can open ports bellow 1024, however it can not kill any process or use chroot.</p>
 
-<p>All linux kernel capabilities <a href="http://linux.die.net/man/7/capabilities">list</a> can be found on man pages.</p>
+<p>All linux kernel capabilities list can be found on <a href="http://linux.die.net/man/7/capabilities">man pages</a> as well as <a href="https://github.com/torvalds/linux/blob/9a3c4145af32125c5ee39c0272662b47307a8323/include/uapi/linux/capability.h">code</a>.</p>
 
 <p>Instead of checking effective UID of user, modern kernels checks for capabilities, so they allow the privileged operation if capability bit is set in the effective set.</p>
 
@@ -274,13 +392,11 @@ Make this token availabe as environment varaible, and&hellip; that&rsquo;s it.</
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p><a href="https://github.com/torvalds/linux/blob/9a3c4145af32125c5ee39c0272662b47307a8323/include/uapi/linux/capability.h">linux capabilities</a></p>
-
 <p>There are four sets of capabilities:
-effective: capabilities that a process is allowed.
-permitted: capabilities that a process is permited. This allows to enable, disable or drop capabilities.
-inheritable: capabilities that a process can give to another process called, for instance, by calling <code>exec()</code> system call.
-bounding set: Limit from capabilities can not be grown. They just can be dropped.</p>
+- effective: capabilities that a process is allowed.
+- permitted: capabilities that a process is permited. This allows to enable, disable or drop capabilities.
+- inheritable: capabilities that a process can give to another process called, for instance, by calling <code>exec()</code> system call.
+- bounding set: Limit from capabilities can not be grown. They just can be dropped.</p>
 
 <p>Credentials, therefore, are mostly a set of uids/guis, management flags, capabilities, namaspaces and cgroups.</p>
 
@@ -367,7 +483,7 @@ bounding set: Limit from capabilities can not be grown. They just can be dropped
 
 <p>Following is an example of setting a capability in command line interface.</p>
 
-<figure class='code'><figcaption><span>setting_beep_capabilities</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 </pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="c"># setcap cap_dac_override,cap_sys_tty_config+ep /usr/bin/beep</span>
 </span></code></pre></td></tr></table></div></figure>
 

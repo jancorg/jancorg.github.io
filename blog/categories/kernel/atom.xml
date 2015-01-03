@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Kernel | I left my leg in Jaglan Beta]]></title>
   <link href="http://jancorg.github.io/blog/categories/kernel/atom.xml" rel="self"/>
   <link href="http://jancorg.github.io/"/>
-  <updated>2015-01-02T22:33:58+01:00</updated>
+  <updated>2015-01-03T20:37:39+01:00</updated>
   <id>http://jancorg.github.io/</id>
   <author>
     <name><![CDATA[jancorg]]></name>
@@ -18,13 +18,13 @@
     <link href="http://jancorg.github.io/blog/2015/01/01/linux-kernel-capabilities/"/>
     <updated>2015-01-01T20:57:16+01:00</updated>
     <id>http://jancorg.github.io/blog/2015/01/01/linux-kernel-capabilities</id>
-    <content type="html"><![CDATA[<p>Capabilities were created as an alternative to classical two level privilege system: root and user. They split a root acoount into their privileges. This way, linux kernel allows a process to perform certain root tipical tasks without giving a process full root privileges.</p>
+    <content type="html"><![CDATA[<p>Capabilities were created as an alternative to classical two level privilege system: root and user. They split a root acount into their privileges. This way, linux kernel allows a process to perform certain root tipical tasks without giving a process full root privileges.</p>
 
 <p>A process (or better, a thread as the smaller unit a capability can be assigned to) can be granted with a given capability. Each capability is independent from each other.</p>
 
 <p>For instance, a user process with just <code>CAP_NET_BIND_SERVICE</code> capability can open ports bellow 1024, however it can not kill any process or use chroot.</p>
 
-<p>All linux kernel capabilities <a href="http://linux.die.net/man/7/capabilities">list</a> can be found on man pages.</p>
+<p>All linux kernel capabilities list can be found on <a href="http://linux.die.net/man/7/capabilities">man pages</a> as well as <a href="https://github.com/torvalds/linux/blob/9a3c4145af32125c5ee39c0272662b47307a8323/include/uapi/linux/capability.h">code</a>.</p>
 
 <p>Instead of checking effective UID of user, modern kernels checks for capabilities, so they allow the privileged operation if capability bit is set in the effective set.</p>
 
@@ -54,13 +54,11 @@
 } kernel_cap_t;
 </code></pre>
 
-<p><a href="https://github.com/torvalds/linux/blob/9a3c4145af32125c5ee39c0272662b47307a8323/include/uapi/linux/capability.h">linux capabilities</a></p>
-
 <p>There are four sets of capabilities:
-effective: capabilities that a process is allowed.
-permitted: capabilities that a process is permited. This allows to enable, disable or drop capabilities.
-inheritable: capabilities that a process can give to another process called, for instance, by calling <code>exec()</code> system call.
-bounding set: Limit from capabilities can not be grown. They just can be dropped.</p>
+- effective: capabilities that a process is allowed.
+- permitted: capabilities that a process is permited. This allows to enable, disable or drop capabilities.
+- inheritable: capabilities that a process can give to another process called, for instance, by calling <code>exec()</code> system call.
+- bounding set: Limit from capabilities can not be grown. They just can be dropped.</p>
 
 <p>Credentials, therefore, are mostly a set of uids/guis, management flags, capabilities, namaspaces and cgroups.</p>
 
@@ -109,7 +107,7 @@ bounding set: Limit from capabilities can not be grown. They just can be dropped
 
 <p>Following is an example of setting a capability in command line interface.</p>
 
-<pre><code class="sh setting_beep_capabilities"># setcap cap_dac_override,cap_sys_tty_config+ep /usr/bin/beep
+<pre><code class="sh "># setcap cap_dac_override,cap_sys_tty_config+ep /usr/bin/beep
 </code></pre>
 ]]></content>
   </entry>
