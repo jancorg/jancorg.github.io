@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Kernel | I left my leg in Jaglan Beta]]></title>
   <link href="http://jancorg.github.io/blog/categories/kernel/atom.xml" rel="self"/>
   <link href="http://jancorg.github.io/"/>
-  <updated>2015-01-03T20:37:39+01:00</updated>
+  <updated>2015-01-05T23:13:32+01:00</updated>
   <id>http://jancorg.github.io/</id>
   <author>
     <name><![CDATA[jancorg]]></name>
@@ -20,7 +20,7 @@
     <id>http://jancorg.github.io/blog/2015/01/01/linux-kernel-capabilities</id>
     <content type="html"><![CDATA[<p>Capabilities were created as an alternative to classical two level privilege system: root and user. They split a root acount into their privileges. This way, linux kernel allows a process to perform certain root tipical tasks without giving a process full root privileges.</p>
 
-<p>A process (or better, a thread as the smaller unit a capability can be assigned to) can be granted with a given capability. Each capability is independent from each other.</p>
+<p>A process or a file, can be granted with a given capability. Each capability is independent from each other.</p>
 
 <p>For instance, a user process with just <code>CAP_NET_BIND_SERVICE</code> capability can open ports bellow 1024, however it can not kill any process or use chroot.</p>
 

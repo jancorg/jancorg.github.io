@@ -9,7 +9,7 @@
   <meta name="author" content="jancorg">
 
   
-  <meta name="description" content="Libcontainer is now the default docker execution environment. It is driver (named native) and a library. Or in other words, it is a replacement ( &hellip;">
+  <meta name="description" content="Namespaces are used to provide a process or a group of process with the idea of being the only process or group of processes in the system. They are &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -21,6 +21,7 @@
   <link rel="canonical" href="http://jancorg.github.io">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/stylesheets/data-table.css" media="screen, projection" rel="stylesheet" type="text/css">
   <link href="/atom.xml" rel="alternate" title="I left my leg in Jaglan Beta" type="application/atom+xml">
   <script src="/javascripts/modernizr-2.0.js"></script>
   <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
@@ -83,6 +84,389 @@
       
   <header>
     
+      <h1 class="entry-title"><a href="/blog/2015/01/05/linux-kernel-namespaces-pt-i/">Linux Kernel Namespaces Pt I</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2015-01-05T20:03:42+01:00'><span class='date'><span class='date-month'>Jan</span> <span class='date-day'>5</span><span class='date-suffix'>th</span>, <span class='date-year'>2015</span></span> <span class='time'>8:03 pm</span></time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>Namespaces are used to provide a process or a group of process with the idea of being the only process or group of processes in the system.</p>
+
+<p>They are a way to detach processes from a specific kernel layer assigning them to a new one. Or in other words, they are indirections layers for global resouces.</p>
+
+<p>Lets imagine this as an extension to classical <code>chroot()</code> syscall. When setting a new root calling chroot, kernel was isolating new branch from existing one, and thus creating a new namespace for the process.</p>
+
+<blockquote><p>Namespaces now provide the basis for a complete lightweight virtualization system, in the form of containers.</p></blockquote>
+
+<p>Currently, linux support following namespaces</p>
+
+<table>
+<thead>
+<tr>
+<th>NameSpace </th>
+<th style="text-align:center;"> from Kernel </th>
+<th> Descrition</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>UTS       </td>
+<td style="text-align:center;"> 2.6.19      </td>
+<td> domain and hostname</td>
+</tr>
+<tr>
+<td>IPC       </td>
+<td style="text-align:center;"> 2.6.19      </td>
+<td> queues, semaphores, and shared memmory</td>
+</tr>
+<tr>
+<td>PID       </td>
+<td style="text-align:center;"> 2.6.19      </td>
+<td> pid</td>
+</tr>
+<tr>
+<td>NS        </td>
+<td style="text-align:center;"> 2.4.19      </td>
+<td> Filesystems</td>
+</tr>
+<tr>
+<td>NET       </td>
+<td style="text-align:center;"> 2.4.24      </td>
+<td> IP, routes, network devices&hellip;</td>
+</tr>
+<tr>
+<td>USER      </td>
+<td style="text-align:center;"> 3.8         </td>
+<td> Uid, Guid,&hellip;</td>
+</tr>
+</tbody>
+</table>
+
+
+<p><br>
+I let individual namespaces explanations as simple as this , or in other words, for another day.</p>
+
+<h2>Namespaces API</h2>
+
+<p>In Linux kernel there are not distinction between process and threads implementions, threads are just light weight processes. Threads are also created by calling <code>clone()</code> but with different arguments (<code>CLONE_VM</code> mainly). From the kernel point of view, a process/thread is a task.</p>
+
+<p>Namespaces can be nested. Limit for nesting namespaces is 32.</p>
+
+<figure class='code'><figcaption><span>nest_limit</span><a href='https://github.com/torvalds/linux/blob/87c31b39abcb6fb6bd7d111200c9627a594bf6a9/kernel/user_namespace.c'>link</a></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='c'><span class='line'><span class="k">if</span> <span class="p">(</span><span class="n">parent_ns</span><span class="o">-&gt;</span><span class="n">level</span> <span class="o">&gt;</span> <span class="mi">32</span><span class="p">)</span>
+</span><span class='line'>  <span class="k">return</span> <span class="o">-</span><span class="n">EUSERS</span><span class="p">;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>Structs</h3>
+
+<p>Next are most important structs parts used by namespaces API.</p>
+
+<figure class='code'><figcaption><span>task_struct</span><a href='https://github.com/torvalds/linux/blob/master/include/linux/sched.h'>link</a></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class='c'><span class='line'><span class="k">struct</span> <span class="n">task_struct</span> <span class="p">{</span>
+</span><span class='line'><span class="p">[...]</span>
+</span><span class='line'><span class="cm">/* process credentials */</span>
+</span><span class='line'>  <span class="k">const</span> <span class="k">struct</span> <span class="n">cred</span> <span class="n">__rcu</span> <span class="o">*</span><span class="n">cred</span><span class="p">;</span> <span class="cm">/* effective (overridable) subjective task</span>
+</span><span class='line'><span class="cm">                  * credentials (COW) */</span>
+</span><span class='line'><span class="p">[...]</span>
+</span><span class='line'><span class="cm">/* namespaces */</span>
+</span><span class='line'>  <span class="k">struct</span> <span class="n">nsproxy</span>          <span class="o">*</span><span class="n">nsproxy</span><span class="p">;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<figure class='code'><figcaption><span>nsproxy</span><a href='https://github.com/torvalds/linux/blob/master/include/linux/nsproxy.h'>link</a></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class='c'><span class='line'><span class="k">struct</span> <span class="n">nsproxy</span> <span class="p">{</span>
+</span><span class='line'>  <span class="kt">atomic_t</span> <span class="n">count</span><span class="p">;</span>
+</span><span class='line'>  <span class="k">struct</span> <span class="n">uts_namespace</span> <span class="o">*</span><span class="n">uts_ns</span><span class="p">;</span>
+</span><span class='line'>  <span class="k">struct</span> <span class="n">ipc_namespace</span> <span class="o">*</span><span class="n">ipc_ns</span><span class="p">;</span>
+</span><span class='line'>  <span class="k">struct</span> <span class="n">mnt_namespace</span> <span class="o">*</span><span class="n">mnt_ns</span><span class="p">;</span>
+</span><span class='line'>  <span class="k">struct</span> <span class="n">pid_namespace</span> <span class="o">*</span><span class="n">pid_ns_for_children</span><span class="p">;</span>
+</span><span class='line'>  <span class="k">struct</span> <span class="n">net</span>           <span class="o">*</span><span class="n">net_ns</span><span class="p">;</span>
+</span><span class='line'><span class="p">};</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<figure class='code'><figcaption><span>credentials</span><a href='https://github.com/torvalds/linux/blob/master/include/linux/cred.h'>link</a></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='c'><span class='line'><span class="k">struct</span> <span class="n">cred</span> <span class="p">{</span>
+</span><span class='line'><span class="p">[...]</span>
+</span><span class='line'>  <span class="k">struct</span> <span class="n">user_namespace</span> <span class="o">*</span><span class="n">user_ns</span><span class="p">;</span> <span class="cm">/* user_ns the caps and keyrings are relative to. */</span>
+</span><span class='line'><span class="p">[...]</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<figure class='code'><figcaption><span>user_namespace</span><a href='https://github.com/torvalds/linux/blob/master/include/linux/user_namespace.h'>link</a></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='c'><span class='line'><span class="k">struct</span> <span class="n">user_namespace</span> <span class="p">{</span>
+</span><span class='line'><span class="p">[...]</span>
+</span><span class='line'>  <span class="k">struct</span> <span class="n">user_namespace</span> <span class="o">*</span><span class="n">parent</span><span class="p">;</span>
+</span><span class='line'>  <span class="k">struct</span> <span class="n">ns_common</span>      <span class="n">ns</span><span class="p">;</span>
+</span><span class='line'><span class="p">[...]</span>
+</span><span class='line'><span class="p">};</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p><br></p>
+
+<h3>System calls</h3>
+
+<p>Namespaces can be created or modified by <code>clone()</code>, <code>unshare()</code> and <code>setns()</code> system calls. All of them are not POSIX system calls, so only available in linux.</p>
+
+<p><code>clone()</code> system call is more specific than <code>fork()</code> or <code>vfork()</code> system calls.  They are alike, because they are implemented by calling <code>do_fork()</code> function with different flags and args.</p>
+
+<figure class='code'><figcaption><span>fork_linux</span><a href='https://github.com/torvalds/linux/blob/master/kernel/fork.c'>link</a></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+</pre></td><td class='code'><pre><code class='c'><span class='line'><span class="n">SYSCALL_DEFINE0</span><span class="p">(</span><span class="n">fork</span><span class="p">)</span>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'>  <span class="k">return</span> <span class="n">do_fork</span><span class="p">(</span><span class="n">SIGCHLD</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">);</span>
+</span><span class='line'><span class="p">[...]</span>
+</span><span class='line'><span class="n">SYSCALL_DEFINE0</span><span class="p">(</span><span class="n">vfork</span><span class="p">)</span>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'>  <span class="k">return</span> <span class="n">do_fork</span><span class="p">(</span><span class="n">CLONE_VFORK</span> <span class="o">|</span> <span class="n">CLONE_VM</span> <span class="o">|</span> <span class="n">SIGCHLD</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span>
+</span><span class='line'>          <span class="mi">0</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">);</span>
+</span><span class='line'><span class="p">[...]</span>
+</span><span class='line'><span class="n">SYSCALL_DEFINE5</span><span class="p">(</span><span class="n">clone</span><span class="p">,</span> <span class="kt">unsigned</span> <span class="kt">long</span><span class="p">,</span> <span class="n">clone_flags</span><span class="p">,</span> <span class="kt">unsigned</span> <span class="kt">long</span><span class="p">,</span> <span class="n">newsp</span><span class="p">,</span> <span class="kt">int</span> <span class="n">__user</span> <span class="o">*</span><span class="p">,</span> <span class="n">parent_tidptr</span><span class="p">,</span> <span class="kt">int</span> <span class="n">__user</span> <span class="o">*</span><span class="p">,</span> <span class="n">child_tidptr</span><span class="p">,</span> <span class="kt">int</span><span class="p">,</span> <span class="n">tls_val</span><span class="p">)</span>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'>  <span class="k">return</span> <span class="n">do_fork</span><span class="p">(</span><span class="n">clone_flags</span><span class="p">,</span> <span class="n">newsp</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">parent_tidptr</span><span class="p">,</span> <span class="n">child_tidptr</span><span class="p">);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p></p>
+
+<p><code>copy_process()</code> function in <code>do_fork()</code> calls <code>copy_namespaces()</code>. In case any namespace flags present, it just uses parent namespaces. (<code>fork()</code>, <code>vfork()</code>  behavior)</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class='c'><span class='line'><span class="k">if</span> <span class="p">(</span><span class="n">likely</span><span class="p">(</span><span class="o">!</span><span class="p">(</span><span class="n">flags</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">CLONE_NEWNS</span> <span class="o">|</span> <span class="n">CLONE_NEWUTS</span> <span class="o">|</span> <span class="n">CLONE_NEWIPC</span> <span class="o">|</span> <span class="n">CLONE_NEWPID</span> <span class="o">|</span> <span class="n">CLONE_NEWNET</span><span class="p">))))</span> <span class="p">{</span>
+</span><span class='line'>      <span class="n">get_nsproxy</span><span class="p">(</span><span class="n">old_ns</span><span class="p">);</span>
+</span><span class='line'>      <span class="k">return</span> <span class="mi">0</span><span class="p">;</span> <span class="p">}</span>
+</span><span class='line'>  
+</span><span class='line'><span class="k">static</span> <span class="kr">inline</span> <span class="kt">void</span> <span class="n">get_nsproxy</span><span class="p">(</span><span class="k">struct</span> <span class="n">nsproxy</span> <span class="o">*</span><span class="n">ns</span><span class="p">)</span>
+</span><span class='line'>  <span class="p">{</span>
+</span><span class='line'>      <span class="n">atomic_inc</span><span class="p">(</span><span class="o">&amp;</span><span class="n">ns</span><span class="o">-&gt;</span><span class="n">count</span><span class="p">);</span>
+</span><span class='line'>  <span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>If any is present, it creates a new nsproxy struct and copies all namespaces.</p>
+
+<figure class='code'><figcaption><span>create_new_namespaces</span><a href='https://github.com/torvalds/linux/blob/603ba7e41bf5d405aba22294af5d075d8898176d/kernel/nsproxy.c'>link</a></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class='c'><span class='line'><span class="n">new_nsp</span> <span class="o">=</span> <span class="n">create_nsproxy</span><span class="p">();</span>
+</span><span class='line'><span class="n">new_nsp</span><span class="o">-&gt;</span><span class="n">mnt_ns</span> <span class="o">=</span> <span class="n">copy_mnt_ns</span><span class="p">(</span><span class="n">flags</span><span class="p">,</span> <span class="n">tsk</span><span class="o">-&gt;</span><span class="n">nsproxy</span><span class="o">-&gt;</span><span class="n">mnt_ns</span><span class="p">,</span> <span class="n">user_ns</span><span class="p">,</span> <span class="n">new_fs</span><span class="p">);</span>
+</span><span class='line'><span class="n">new_nsp</span><span class="o">-&gt;</span><span class="n">uts_ns</span> <span class="o">=</span> <span class="n">copy_utsname</span><span class="p">(</span><span class="n">flags</span><span class="p">,</span> <span class="n">user_ns</span><span class="p">,</span> <span class="n">tsk</span><span class="o">-&gt;</span><span class="n">nsproxy</span><span class="o">-&gt;</span><span class="n">uts_ns</span><span class="p">);</span>
+</span><span class='line'><span class="n">new_nsp</span><span class="o">-&gt;</span><span class="n">ipc_ns</span> <span class="o">=</span> <span class="n">copy_ipcs</span><span class="p">(</span><span class="n">flags</span><span class="p">,</span> <span class="n">user_ns</span><span class="p">,</span> <span class="n">tsk</span><span class="o">-&gt;</span><span class="n">nsproxy</span><span class="o">-&gt;</span><span class="n">ipc_ns</span><span class="p">);</span>
+</span><span class='line'><span class="n">new_nsp</span><span class="o">-&gt;</span><span class="n">pid_ns_for_children</span> <span class="o">=</span> <span class="n">copy_pid_ns</span><span class="p">(</span><span class="n">flags</span><span class="p">,</span> <span class="n">user_ns</span><span class="p">,</span> <span class="n">tsk</span><span class="o">-&gt;</span><span class="n">nsproxy</span><span class="o">-&gt;</span><span class="n">pid_ns_for_children</span><span class="p">);</span>
+</span><span class='line'><span class="n">new_nsp</span><span class="o">-&gt;</span><span class="n">net_ns</span> <span class="o">=</span> <span class="n">copy_net_ns</span><span class="p">(</span><span class="n">flags</span><span class="p">,</span> <span class="n">user_ns</span><span class="p">,</span> <span class="n">tsk</span><span class="o">-&gt;</span><span class="n">nsproxy</span><span class="o">-&gt;</span><span class="n">net_ns</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">return</span> <span class="n">new_nsp</span><span class="p">;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Child process is responsible for changing any namespace data.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='c'><span class='line'><span class="n">sethostname</span><span class="p">(</span><span class="n">hostname</span><span class="p">,</span> <span class="n">strlen</span><span class="p">(</span><span class="n">hostname</span><span class="p">);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p><code>unshare()</code> system call allows a process to disassociate parts of its execution context that are currently being shared with other processes.</p>
+
+<p>It allows to control shared execution context without creating a new process.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='c'><span class='line'><span class="n">SYSCALL_DEFINE1</span><span class="p">(</span><span class="n">unshare</span><span class="p">,</span> <span class="kt">unsigned</span> <span class="kt">long</span><span class="p">,</span> <span class="n">unshare_flags</span><span class="p">)</span>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'>  <span class="n">err</span> <span class="o">=</span> <span class="n">unshare_fs</span><span class="p">(</span><span class="n">unshare_flags</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">new_fs</span><span class="p">);</span>
+</span><span class='line'>  <span class="n">err</span> <span class="o">=</span> <span class="n">unshare_fd</span><span class="p">(</span><span class="n">unshare_flags</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">new_fd</span><span class="p">);</span>
+</span><span class='line'>  <span class="n">err</span> <span class="o">=</span> <span class="n">unshare_userns</span><span class="p">(</span><span class="n">unshare_flags</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">new_cred</span><span class="p">);</span>
+</span><span class='line'>  <span class="n">err</span> <span class="o">=</span> <span class="n">unshare_nsproxy_namespaces</span><span class="p">(</span><span class="n">unshare_flags</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">new_nsproxy</span><span class="p">,</span> <span class="n">new_cred</span><span class="p">,</span> <span class="n">new_fs</span><span class="p">);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Flags like <code>CLONE_NEW*</code> flags have same effect as they have in <code>clone()</code>. All others ones that <code>unshare()</code> accepts has reverse effect. Since they were copied in above <code>create_new_namespaces</code> example.</p>
+
+<p>When a task ends, all namespaces they belong to that does not have any other process attached are cleaned. This means, mounts unmounted, network interfaced destroyed, etc.</p>
+
+<figure class='code'><figcaption><span>put_nsproxy</span><a href='https://github.com/torvalds/linux/blob/master/include/linux/nsproxy.h'>link</a></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='c'><span class='line'><span class="k">static</span> <span class="kr">inline</span> <span class="kt">void</span> <span class="nf">put_nsproxy</span><span class="p">(</span><span class="k">struct</span> <span class="n">nsproxy</span> <span class="o">*</span><span class="n">ns</span><span class="p">)</span>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'>  <span class="k">if</span> <span class="p">(</span><span class="n">atomic_dec_and_test</span><span class="p">(</span><span class="o">&amp;</span><span class="n">ns</span><span class="o">-&gt;</span><span class="n">count</span><span class="p">))</span> <span class="p">{</span>
+</span><span class='line'>      <span class="n">free_nsproxy</span><span class="p">(</span><span class="n">ns</span><span class="p">);</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Last API function to comment is <code>setns()</code> that simply allows a process to join an existing namespace.</p>
+
+<figure class='code'><figcaption><span>setns</span><a href='https://github.com/torvalds/linux/blob/603ba7e41bf5d405aba22294af5d075d8898176d/kernel/nsproxy.c'>link</a></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class='c'><span class='line'><span class="n">SYSCALL_DEFINE2</span><span class="p">(</span><span class="n">setns</span><span class="p">,</span> <span class="kt">int</span><span class="p">,</span> <span class="n">fd</span><span class="p">,</span> <span class="kt">int</span><span class="p">,</span> <span class="n">nstype</span><span class="p">)</span>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'>  <span class="n">file</span> <span class="o">=</span> <span class="n">proc_ns_fget</span><span class="p">(</span><span class="n">fd</span><span class="p">);</span>
+</span><span class='line'>  <span class="n">ns</span> <span class="o">=</span> <span class="n">get_proc_ns</span><span class="p">(</span><span class="n">file_inode</span><span class="p">(</span><span class="n">file</span><span class="p">));</span>
+</span><span class='line'>  <span class="n">new_nsproxy</span> <span class="o">=</span> <span class="n">create_new_namespaces</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">tsk</span><span class="p">,</span> <span class="n">current_user_ns</span><span class="p">(),</span> <span class="n">tsk</span><span class="o">-&gt;</span><span class="n">fs</span><span class="p">);</span>
+</span><span class='line'>  <span class="n">err</span> <span class="o">=</span> <span class="n">ns</span><span class="o">-&gt;</span><span class="n">ops</span><span class="o">-&gt;</span><span class="n">install</span><span class="p">(</span><span class="n">new_nsproxy</span><span class="p">,</span> <span class="n">ns</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="n">switch_task_namespaces</span><span class="p">(</span><span class="n">tsk</span><span class="p">,</span> <span class="n">new_nsproxy</span><span class="p">);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>fd argument specifies the namespace to join. It is translated to a nscommon struct calling <code>get_proc_ns(file_inode(file))</code>. We will cover fds in next point.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='c'><span class='line'><span class="n">define</span> <span class="n">get_proc_ns</span><span class="p">(</span><span class="n">inode</span><span class="p">)</span> <span class="p">((</span><span class="k">struct</span> <span class="n">ns_common</span> <span class="o">*</span><span class="p">)(</span><span class="n">inode</span><span class="p">)</span><span class="o">-&gt;</span><span class="n">i_private</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>Namespaces in /proc</h2>
+
+<p>Per process namespaces can be found under <code>/proc/PID/ns</code>.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nv">$ </span>ls -l /proc/<span class="nv">$$</span>/ns
+</span><span class='line'>total 0
+</span><span class='line'>lrwxrwxrwx <span class="m">1</span> ubuntu ubuntu <span class="m">0</span> Jan  <span class="m">5</span> 21:12 ipc -&gt; ipc:<span class="o">[</span>4026531839<span class="o">]</span>
+</span><span class='line'>lrwxrwxrwx <span class="m">1</span> ubuntu ubuntu <span class="m">0</span> Jan  <span class="m">5</span> 21:12 mnt -&gt; mnt:<span class="o">[</span>4026531840<span class="o">]</span>
+</span><span class='line'>lrwxrwxrwx <span class="m">1</span> ubuntu ubuntu <span class="m">0</span> Jan  <span class="m">5</span> 21:12 net -&gt; net:<span class="o">[</span>4026531962<span class="o">]</span>
+</span><span class='line'>lrwxrwxrwx <span class="m">1</span> ubuntu ubuntu <span class="m">0</span> Jan  <span class="m">5</span> 21:12 pid -&gt; pid:<span class="o">[</span>4026531836<span class="o">]</span>
+</span><span class='line'>lrwxrwxrwx <span class="m">1</span> ubuntu ubuntu <span class="m">0</span> Jan  <span class="m">5</span> 21:12 user -&gt; user:<span class="o">[</span>4026531837<span class="o">]</span>
+</span><span class='line'>lrwxrwxrwx <span class="m">1</span> ubuntu ubuntu <span class="m">0</span> Jan  <span class="m">5</span> 21:12 uts -&gt; uts:<span class="o">[</span>4026531838<span class="o">]</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Each process namespace has an id number, that corresponds with a namespace struct. If two tasks share same number, they belongs to same namespace. Inode for ns files in namespaces is not the same as <code>stat -c %i</code> shows.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="c"># for pid in 643 23681 32178 ; do readlink /proc/$pid/ns/mnt ; done</span>
+</span><span class='line'>mnt:<span class="o">[</span>4026531840<span class="o">]</span>
+</span><span class='line'>mnt:<span class="o">[</span>4026532430<span class="o">]</span>
+</span><span class='line'>mnt:<span class="o">[</span>4026532430<span class="o">]</span>
+</span><span class='line'><span class="c"># for pid in 643 23681 32178 ; do md5sum /proc/$pid/mounts ; done</span>
+</span><span class='line'>8dddf7d919672a56849bb487840b94e0  /proc/643/mounts
+</span><span class='line'>70159c37e8c8f16c61ceaa047ad9528a  /proc/23681/mounts
+</span><span class='line'>70159c37e8c8f16c61ceaa047ad9528a  /proc/32178/mounts
+</span><span class='line'><span class="c"># unshare -m /bin/bash </span>
+</span><span class='line'><span class="c"># readlink /proc/$$/ns/mnt</span>
+</span><span class='line'>mnt:<span class="o">[</span>4026532493<span class="o">]</span>
+</span><span class='line'><span class="c"># for pid in  643 23681 32178; do stat -c %i /proc/$pid/ns/mnt ; done</span>
+</span><span class='line'>1308868
+</span><span class='line'>1308731
+</span><span class='line'>1308686
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p><br>
+There are availabe two commands that correspond to each system call (like most of the shell commands that are just called like any system call). <code>unshare</code> for <code>unshare()</code> and <code>nsenter</code> for <code>setns()</code>.</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
       <h1 class="entry-title"><a href="/blog/2015/01/03/libcontainer-overview/">LibContainer Overview</a></h1>
     
     
@@ -109,7 +493,7 @@
 
 <p>It is meant to be a cross-system abstraction layer being an attempt to standarize the way apps are packed up, delivered, and run in isolation.</p>
 
-<p>Making libcontainer a stand alone project, makes possible to other game players to adopt it. Google, parallels (openvz), redhat, ubuntu (lxc). are also contributing to this project.</p>
+<p>Libcontainer as a stand alone project, makes possible to other game players to adopting it. Google, parallels (openvz), redhat, ubuntu (lxc). are also contributing to this project.</p>
 
 <p><img src="http://1.bp.blogspot.com/-sxNaakTEBlg/U6Bbtglx00I/AAAAAAAAAcw/xgreTVZP4F4/s1600/libcontainer+intro.png" alt="libcontainer_place" /></p>
 
@@ -130,7 +514,7 @@
 
 <p><code>nsenter</code> replaces <code>lxc-attach</code> and it is not part of libcontainer package, but it is part of <code>util-linux</code> <a href="https://www.kernel.org/pub/linux/utils/util-linux/">package</a>.</p>
 
-<p>When formerly we ran &ldquo;docker run &hellip;&rdquo;, (by default) it called <code>lxc-start</code> to run the container.</p>
+<p>When formerly we ran <code>docker run ...</code>, (by default) it called <code>lxc-start</code> to run the container.</p>
 
 <figure class='code'><figcaption><span>lxc-start</span><a href='https://github.com/docker/docker/blob/17cacf3326edde6d177e12132f74fc0174bda1d2/daemon/execdriver/lxc/driver.go'>link</a></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -353,7 +737,7 @@ In this article I am just going to treat merging as as example, but concepts sho
 <p>We can find some git related scripts under scripts folder in <a href="https://github.com/github/hubot-scripts">hubot-scripts</a> github project.
 This time I have tested <a href="https://github.com/github/hubot-scripts/blob/master/src/scripts/github-merge.coffee">github-merge.coffee</a> plugin. It uses <a href="https://github.com/iangreenleaf/githubot">githubot</a> project for github API access.</p>
 
-<p>We need to set some variables in orther this to work. They are made available to hubot as environment variables, so you can set them on <code>env-vars.sh</code> script mentioned in Dockerfile.</p>
+<p>We need to set some variables in order this to work. They are made available to hubot as environment variables, so you can set them on <code>env-vars.sh</code> script mentioned in Dockerfile.</p>
 
 <figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -454,7 +838,7 @@ Make this token availabe as environment varaible, and&hellip; that&rsquo;s it.</
 
   <div class="entry-content"><p>Capabilities were created as an alternative to classical two level privilege system: root and user. They split a root acount into their privileges. This way, linux kernel allows a process to perform certain root tipical tasks without giving a process full root privileges.</p>
 
-<p>A process (or better, a thread as the smaller unit a capability can be assigned to) can be granted with a given capability. Each capability is independent from each other.</p>
+<p>A process or a file, can be granted with a given capability. Each capability is independent from each other.</p>
 
 <p>For instance, a user process with just <code>CAP_NET_BIND_SERVICE</code> capability can open ports bellow 1024, however it can not kill any process or use chroot.</p>
 
@@ -628,6 +1012,10 @@ Make this token availabe as environment varaible, and&hellip; that&rsquo;s it.</
     <section>
   <h1>Recent Posts</h1>
   <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2015/01/05/linux-kernel-namespaces-pt-i/">Linux Kernel Namespaces Pt I</a>
+      </li>
     
       <li class="post">
         <a href="/blog/2015/01/03/libcontainer-overview/">LibContainer Overview</a>

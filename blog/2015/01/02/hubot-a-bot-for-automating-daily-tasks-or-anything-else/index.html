@@ -21,6 +21,7 @@
   <link rel="canonical" href="http://jancorg.github.io/blog/2015/01/02/hubot-a-bot-for-automating-daily-tasks-or-anything-else">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/stylesheets/data-table.css" media="screen, projection" rel="stylesheet" type="text/css">
   <link href="/atom.xml" rel="alternate" title="I left my leg in Jaglan Beta" type="application/atom+xml">
   <script src="/javascripts/modernizr-2.0.js"></script>
   <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
@@ -212,7 +213,7 @@ In this article I am just going to treat merging as as example, but concepts sho
 <p>We can find some git related scripts under scripts folder in <a href="https://github.com/github/hubot-scripts">hubot-scripts</a> github project.
 This time I have tested <a href="https://github.com/github/hubot-scripts/blob/master/src/scripts/github-merge.coffee">github-merge.coffee</a> plugin. It uses <a href="https://github.com/iangreenleaf/githubot">githubot</a> project for github API access.</p>
 
-<p>We need to set some variables in orther this to work. They are made available to hubot as environment variables, so you can set them on <code>env-vars.sh</code> script mentioned in Dockerfile.</p>
+<p>We need to set some variables in order this to work. They are made available to hubot as environment variables, so you can set them on <code>env-vars.sh</code> script mentioned in Dockerfile.</p>
 
 <figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -339,6 +340,10 @@ Make this token availabe as environment varaible, and&hellip; that&rsquo;s it.</
     <section>
   <h1>Recent Posts</h1>
   <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2015/01/05/linux-kernel-namespaces-pt-i/">Linux Kernel Namespaces Pt I</a>
+      </li>
     
       <li class="post">
         <a href="/blog/2015/01/03/libcontainer-overview/">LibContainer Overview</a>

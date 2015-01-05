@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Chatops | I left my leg in Jaglan Beta]]></title>
   <link href="http://jancorg.github.io/blog/categories/chatops/atom.xml" rel="self"/>
   <link href="http://jancorg.github.io/"/>
-  <updated>2015-01-03T20:37:39+01:00</updated>
+  <updated>2015-01-05T23:13:32+01:00</updated>
   <id>http://jancorg.github.io/</id>
   <author>
     <name><![CDATA[jancorg]]></name>
@@ -90,7 +90,7 @@ In this article I am just going to treat merging as as example, but concepts sho
 <p>We can find some git related scripts under scripts folder in <a href="https://github.com/github/hubot-scripts">hubot-scripts</a> github project.
 This time I have tested <a href="https://github.com/github/hubot-scripts/blob/master/src/scripts/github-merge.coffee">github-merge.coffee</a> plugin. It uses <a href="https://github.com/iangreenleaf/githubot">githubot</a> project for github API access.</p>
 
-<p>We need to set some variables in orther this to work. They are made available to hubot as environment variables, so you can set them on <code>env-vars.sh</code> script mentioned in Dockerfile.</p>
+<p>We need to set some variables in order this to work. They are made available to hubot as environment variables, so you can set them on <code>env-vars.sh</code> script mentioned in Dockerfile.</p>
 
 <pre><code class="sh ">export HUBOT_GITHUB_TOKEN=$token
 export HUBOT_GITHUB_API_VERSION=$api_version

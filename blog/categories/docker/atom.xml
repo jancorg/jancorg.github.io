@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Docker | I left my leg in Jaglan Beta]]></title>
   <link href="http://jancorg.github.io/blog/categories/docker/atom.xml" rel="self"/>
   <link href="http://jancorg.github.io/"/>
-  <updated>2015-01-03T20:37:39+01:00</updated>
+  <updated>2015-01-05T23:13:32+01:00</updated>
   <id>http://jancorg.github.io/</id>
   <author>
     <name><![CDATA[jancorg]]></name>
@@ -28,7 +28,7 @@
 
 <p>It is meant to be a cross-system abstraction layer being an attempt to standarize the way apps are packed up, delivered, and run in isolation.</p>
 
-<p>Making libcontainer a stand alone project, makes possible to other game players to adopt it. Google, parallels (openvz), redhat, ubuntu (lxc). are also contributing to this project.</p>
+<p>Libcontainer as a stand alone project, makes possible to other game players to adopting it. Google, parallels (openvz), redhat, ubuntu (lxc). are also contributing to this project.</p>
 
 <p><img src="http://1.bp.blogspot.com/-sxNaakTEBlg/U6Bbtglx00I/AAAAAAAAAcw/xgreTVZP4F4/s1600/libcontainer+intro.png" alt="libcontainer_place" /></p>
 
@@ -49,14 +49,14 @@
 
 <p><code>nsenter</code> replaces <code>lxc-attach</code> and it is not part of libcontainer package, but it is part of <code>util-linux</code> <a href="https://www.kernel.org/pub/linux/utils/util-linux/">package</a>.</p>
 
-<p>When formerly we ran &ldquo;docker run &hellip;&rdquo;, (by default) it called <code>lxc-start</code> to run the container.
-<code>go lxc-start https://github.com/docker/docker/blob/17cacf3326edde6d177e12132f74fc0174bda1d2/daemon/execdriver/lxc/driver.go
-    params := []string{
+<p>When formerly we ran <code>docker run ...</code>, (by default) it called <code>lxc-start</code> to run the container.</p>
+
+<pre><code class="go lxc-start https://github.com/docker/docker/blob/17cacf3326edde6d177e12132f74fc0174bda1d2/daemon/execdriver/lxc/driver.go">    params := []string{
         "lxc-start",
         "-n", c.ID,
         "-f", configPath,
     }
-</code></p>
+</code></pre>
 
 <p>Currently, native execdriver is called.</p>
 
@@ -176,7 +176,7 @@ In this article I am just going to treat merging as as example, but concepts sho
 <p>We can find some git related scripts under scripts folder in <a href="https://github.com/github/hubot-scripts">hubot-scripts</a> github project.
 This time I have tested <a href="https://github.com/github/hubot-scripts/blob/master/src/scripts/github-merge.coffee">github-merge.coffee</a> plugin. It uses <a href="https://github.com/iangreenleaf/githubot">githubot</a> project for github API access.</p>
 
-<p>We need to set some variables in orther this to work. They are made available to hubot as environment variables, so you can set them on <code>env-vars.sh</code> script mentioned in Dockerfile.</p>
+<p>We need to set some variables in order this to work. They are made available to hubot as environment variables, so you can set them on <code>env-vars.sh</code> script mentioned in Dockerfile.</p>
 
 <pre><code class="sh ">export HUBOT_GITHUB_TOKEN=$token
 export HUBOT_GITHUB_API_VERSION=$api_version

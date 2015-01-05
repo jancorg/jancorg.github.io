@@ -21,6 +21,7 @@
   <link rel="canonical" href="http://jancorg.github.io/blog/2015/01/03/libcontainer-overview">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/stylesheets/data-table.css" media="screen, projection" rel="stylesheet" type="text/css">
   <link href="/atom.xml" rel="alternate" title="I left my leg in Jaglan Beta" type="application/atom+xml">
   <script src="/javascripts/modernizr-2.0.js"></script>
   <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
@@ -106,7 +107,7 @@
 
 <p>It is meant to be a cross-system abstraction layer being an attempt to standarize the way apps are packed up, delivered, and run in isolation.</p>
 
-<p>Making libcontainer a stand alone project, makes possible to other game players to adopt it. Google, parallels (openvz), redhat, ubuntu (lxc). are also contributing to this project.</p>
+<p>Libcontainer as a stand alone project, makes possible to other game players to adopting it. Google, parallels (openvz), redhat, ubuntu (lxc). are also contributing to this project.</p>
 
 <p><img src="http://1.bp.blogspot.com/-sxNaakTEBlg/U6Bbtglx00I/AAAAAAAAAcw/xgreTVZP4F4/s1600/libcontainer+intro.png" alt="libcontainer_place" /></p>
 
@@ -127,7 +128,7 @@
 
 <p><code>nsenter</code> replaces <code>lxc-attach</code> and it is not part of libcontainer package, but it is part of <code>util-linux</code> <a href="https://www.kernel.org/pub/linux/utils/util-linux/">package</a>.</p>
 
-<p>When formerly we ran &ldquo;docker run &hellip;&rdquo;, (by default) it called <code>lxc-start</code> to run the container.</p>
+<p>When formerly we ran <code>docker run ...</code>, (by default) it called <code>lxc-start</code> to run the container.</p>
 
 <figure class='code'><figcaption><span>lxc-start</span><a href='https://github.com/docker/docker/blob/17cacf3326edde6d177e12132f74fc0174bda1d2/daemon/execdriver/lxc/driver.go'>link</a></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -249,6 +250,8 @@
         <a class="basic-alignment left" href="/blog/2015/01/02/hubot-a-bot-for-automating-daily-tasks-or-anything-else/" title="Previous Post: Hubot: A bot for automating daily tasks or anything else">&laquo; Hubot: A bot for automating daily tasks or anything else</a>
       
       
+        <a class="basic-alignment right" href="/blog/2015/01/05/linux-kernel-namespaces-pt-i/" title="Next Post: Linux Kernel Namespaces pt I">Linux Kernel Namespaces pt I &raquo;</a>
+      
     </p>
   </footer>
 </article>
@@ -260,6 +263,10 @@
     <section>
   <h1>Recent Posts</h1>
   <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2015/01/05/linux-kernel-namespaces-pt-i/">Linux Kernel Namespaces Pt I</a>
+      </li>
     
       <li class="post">
         <a href="/blog/2015/01/03/libcontainer-overview/">LibContainer Overview</a>
