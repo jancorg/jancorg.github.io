@@ -80,7 +80,7 @@ In this article I am just going to treat merging as as example, but concepts sho
 We can find some git related scripts under scripts folder in [hubot-scripts](https://github.com/github/hubot-scripts) github project. 
 This time I have tested [github-merge.coffee](https://github.com/github/hubot-scripts/blob/master/src/scripts/github-merge.coffee) plugin. It uses [githubot](https://github.com/iangreenleaf/githubot) project for github API access.
 
-We need to set some variables in orther this to work. They are made available to hubot as environment variables, so you can set them on `env-vars.sh` script mentioned in Dockerfile.
+We need to set some variables in order this to work. They are made available to hubot as environment variables, so you can set them on `env-vars.sh` script mentioned in Dockerfile.
 
 ``` sh 
 export HUBOT_GITHUB_TOKEN=$token

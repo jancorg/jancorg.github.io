@@ -8,7 +8,7 @@ categories: [ devops, linux, kernel, capabilities ]
 
 Capabilities were created as an alternative to classical two level privilege system: root and user. They split a root acount into their privileges. This way, linux kernel allows a process to perform certain root tipical tasks without giving a process full root privileges.
 
-A process (or better, a thread as the smaller unit a capability can be assigned to) can be granted with a given capability. Each capability is independent from each other.
+A process or a file, can be granted with a given capability. Each capability is independent from each other.
 
 For instance, a user process with just `CAP_NET_BIND_SERVICE` capability can open ports bellow 1024, however it can not kill any process or use chroot.
 

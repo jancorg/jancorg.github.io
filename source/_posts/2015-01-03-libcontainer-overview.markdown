@@ -18,7 +18,7 @@ This library is developed by docker.io, written in go and C/C++, in order to sup
 
 It is meant to be a cross-system abstraction layer being an attempt to standarize the way apps are packed up, delivered, and run in isolation.
 
-Making libcontainer a stand alone project, makes possible to other game players to adopt it. Google, parallels (openvz), redhat, ubuntu (lxc). are also contributing to this project.
+Libcontainer as a stand alone project, makes possible to other game players to adopting it. Google, parallels (openvz), redhat, ubuntu (lxc). are also contributing to this project.
 
 ![libcontainer_place](http://1.bp.blogspot.com/-sxNaakTEBlg/U6Bbtglx00I/AAAAAAAAAcw/xgreTVZP4F4/s1600/libcontainer+intro.png)
 
@@ -41,7 +41,8 @@ Let`s see a little example of how it was replaced on docker code.
 `nsenter` replaces `lxc-attach` and it is not part of libcontainer package, but it is part of `util-linux` [package](https://www.kernel.org/pub/linux/utils/util-linux/).
 
 
-When formerly we ran "docker run ...", (by default) it called `lxc-start` to run the container. 
+When formerly we ran `docker run ...`, (by default) it called `lxc-start` to run the container. 
+
 ``` go lxc-start https://github.com/docker/docker/blob/17cacf3326edde6d177e12132f74fc0174bda1d2/daemon/execdriver/lxc/driver.go
 	params := []string{
 		"lxc-start",
