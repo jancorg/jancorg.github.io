@@ -9,7 +9,7 @@
   <meta name="author" content="jancorg">
 
   
-  <meta name="description" content="Namespaces are used to provide a process or a group of process with the idea of being the only process or group of processes in the system. They are &hellip;">
+  <meta name="description" content="Namespaces are used to provide a process or a group of processes with the idea of being the only process or group of processes in the system. They &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -97,9 +97,9 @@
   </header>
 
 
-<div class="entry-content"><p>Namespaces are used to provide a process or a group of process with the idea of being the only process or group of processes in the system.</p>
+<div class="entry-content"><p>Namespaces are used to provide a process or a group of processes with the idea of being the only process or group of processes in the system.</p>
 
-<p>They are a way to detach processes from a specific kernel layer assigning them to a new one. Or in other words, they are indirections layers for global resouces.</p>
+<p>They are a way to detach processes from a specific kernel layer assigning them to a new one. Or in other words, they are indirections layers for global resources.</p>
 
 <p>Lets imagine this as an extension to classical <code>chroot()</code> syscall. When setting a new root calling chroot, kernel was isolating new branch from existing one, and thus creating a new namespace for the process.</p>
 
@@ -151,7 +151,7 @@
 
 
 <p><br>
-I let individual namespaces explanations as simple as this , or in other words, for another day.</p>
+I let individual namespaces explanations as simple as this, or in other words, for another day.</p>
 
 <h2>Namespaces API</h2>
 
@@ -415,7 +415,7 @@ I let individual namespaces explanations as simple as this , or in other words, 
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>Each process namespace has an id number, that corresponds with a namespace struct. If two tasks share same number, they belongs to same namespace. Inode for ns files in namespaces is not the same as <code>stat -c %i</code> shows.</p>
+<p>Each process namespace has an id number, that corresponds with a namespace struct. If two tasks share same number, they belongs to same namespace. Inode for ns files in namespaces is not the same as <code>stat -c %i</code> shows. They are sym links.</p>
 
 <figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
