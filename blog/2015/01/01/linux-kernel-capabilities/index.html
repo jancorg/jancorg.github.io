@@ -158,11 +158,15 @@
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>There are four sets of capabilities:
-- effective: capabilities that a process is allowed.
-- permitted: capabilities that a process is permited. This allows to enable, disable or drop capabilities.
-- inheritable: capabilities that a process can give to another process called, for instance, by calling <code>exec()</code> system call.
-- bounding set: Limit from capabilities can not be grown. They just can be dropped.</p>
+<p>There are four sets of capabilities:</p>
+
+<ul>
+<li><strong>effective</strong>: capabilities that a process is allowed.</li>
+<li><strong>permitted</strong>: capabilities that a process is permited. This allows to enable, disable or drop capabilities.</li>
+<li><strong>inheritable</strong>: capabilities that a process can give to another process called, for instance, by calling <code>exec()</code> system call.</li>
+<li><strong>bounding set</strong>: Limit from capabilities can not be grown. They just can be dropped.</li>
+</ul>
+
 
 <p>Credentials, therefore, are mostly a set of uids/guis, management flags, capabilities, namaspaces and cgroups.</p>
 

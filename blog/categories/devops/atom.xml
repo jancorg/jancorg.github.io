@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Devops | I left my leg in Jaglan Beta]]></title>
   <link href="http://jancorg.github.io/blog/categories/devops/atom.xml" rel="self"/>
   <link href="http://jancorg.github.io/"/>
-  <updated>2015-01-05T23:50:30+01:00</updated>
+  <updated>2015-01-06T02:53:59+01:00</updated>
   <id>http://jancorg.github.io/</id>
   <author>
     <name><![CDATA[jancorg]]></name>
@@ -14,13 +14,253 @@
 
   
   <entry>
+    <title type="html"><![CDATA[Linux Kernel Namespaces Pt I]]></title>
+    <link href="http://jancorg.github.io/blog/2015/01/05/linux-kernel-namespaces-pt-i/"/>
+    <updated>2015-01-05T20:03:42+01:00</updated>
+    <id>http://jancorg.github.io/blog/2015/01/05/linux-kernel-namespaces-pt-i</id>
+    <content type="html"><![CDATA[<p>Namespaces are used to provide a process or a group of processes with the idea of being the only process or group of processes in the system.</p>
+
+<p>They are a way to detach processes from a specific kernel layer assigning them to a new one. Or in other words, they are indirections layers for global resources.</p>
+
+<p>Lets imagine this as an extension to classical <code>chroot()</code> syscall. When setting a new root calling chroot, kernel was isolating new branch from existing one, and thus creating a new namespace for the process.</p>
+
+<blockquote><p>Namespaces now provide the basis for a complete lightweight virtualization system, in the form of containers.</p></blockquote>
+
+<p>Currently, linux support following namespaces</p>
+
+<table>
+<thead>
+<tr>
+<th>NameSpace </th>
+<th style="text-align:center;"> from Kernel </th>
+<th> Descrition</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>UTS       </td>
+<td style="text-align:center;"> 2.6.19      </td>
+<td> domain and hostname</td>
+</tr>
+<tr>
+<td>IPC       </td>
+<td style="text-align:center;"> 2.6.19      </td>
+<td> queues, semaphores, and shared memmory</td>
+</tr>
+<tr>
+<td>PID       </td>
+<td style="text-align:center;"> 2.6.19      </td>
+<td> pid</td>
+</tr>
+<tr>
+<td>NS        </td>
+<td style="text-align:center;"> 2.4.19      </td>
+<td> Filesystems</td>
+</tr>
+<tr>
+<td>NET       </td>
+<td style="text-align:center;"> 2.4.24      </td>
+<td> IP, routes, network devices&hellip;</td>
+</tr>
+<tr>
+<td>USER      </td>
+<td style="text-align:center;"> 3.8         </td>
+<td> Uid, Guid,&hellip;</td>
+</tr>
+</tbody>
+</table>
+
+
+<p><br>
+I let individual namespaces explanations as simple as this, or in other words, for another day.</p>
+
+<h2>Namespaces API</h2>
+
+<p>In Linux kernel there are not distinction between process and threads implementions, threads are just light weight processes. Threads are also created by calling <code>clone()</code> but with different arguments (<code>CLONE_VM</code> mainly). From the kernel point of view, a process/thread is a task.</p>
+
+<p>Namespaces can be nested. Limit for nesting namespaces is 32.</p>
+
+<pre><code class="c nest_limit https://github.com/torvalds/linux/blob/87c31b39abcb6fb6bd7d111200c9627a594bf6a9/kernel/user_namespace.c">    if (parent_ns-&gt;level &gt; 32)
+        return -EUSERS;
+</code></pre>
+
+<h3>Structs</h3>
+
+<p>Next are most important structs parts used by namespaces API.</p>
+
+<pre><code class="c task_struct https://github.com/torvalds/linux/blob/master/include/linux/sched.h ">struct task_struct {
+[...]
+/* process credentials */
+    const struct cred __rcu *cred;  /* effective (overridable) subjective task
+                     * credentials (COW) */
+[...]
+/* namespaces */
+    struct nsproxy          *nsproxy;
+</code></pre>
+
+<pre><code class="c nsproxy https://github.com/torvalds/linux/blob/master/include/linux/nsproxy.h">struct nsproxy {
+    atomic_t count;
+    struct uts_namespace *uts_ns;
+    struct ipc_namespace *ipc_ns;
+    struct mnt_namespace *mnt_ns;
+    struct pid_namespace *pid_ns_for_children;
+    struct net           *net_ns;
+};
+</code></pre>
+
+<pre><code class="c credentials https://github.com/torvalds/linux/blob/master/include/linux/cred.h">struct cred {
+[...]
+    struct user_namespace *user_ns; /* user_ns the caps and keyrings are relative to. */
+[...]
+</code></pre>
+
+<pre><code class="c user_namespace https://github.com/torvalds/linux/blob/master/include/linux/user_namespace.h">struct user_namespace {
+[...]
+    struct user_namespace   *parent;
+    struct ns_common        ns;
+[...]
+};
+</code></pre>
+
+<p><br></p>
+
+<h3>System calls</h3>
+
+<p>Namespaces can be created or modified by <code>clone()</code>, <code>unshare()</code> and <code>setns()</code> system calls. All of them are not POSIX system calls, so only available in linux.</p>
+
+<p><code>clone()</code> system call is more specific than <code>fork()</code> or <code>vfork()</code> system calls.  They are alike, because they are implemented by calling <code>do_fork()</code> function with different flags and args.</p>
+
+<pre><code class="c fork_linux https://github.com/torvalds/linux/blob/master/kernel/fork.c">SYSCALL_DEFINE0(fork)
+{
+    return do_fork(SIGCHLD, 0, 0, NULL, NULL);
+[...]
+SYSCALL_DEFINE0(vfork)
+{
+    return do_fork(CLONE_VFORK | CLONE_VM | SIGCHLD, 0,
+            0, NULL, NULL);
+[...]
+SYSCALL_DEFINE5(clone, unsigned long, clone_flags, unsigned long, newsp, int __user *, parent_tidptr, int __user *, child_tidptr, int, tls_val)
+{
+    return do_fork(clone_flags, newsp, 0, parent_tidptr, child_tidptr);
+</code></pre>
+
+<p><code>copy_process()</code> function in <code>do_fork()</code> calls <code>copy_namespaces()</code>. In case any namespace flags present, it just uses parent namespaces. (<code>fork()</code>, <code>vfork()</code>  behavior)</p>
+
+<pre><code class="c ">if (likely(!(flags &amp; (CLONE_NEWNS | CLONE_NEWUTS | CLONE_NEWIPC | CLONE_NEWPID | CLONE_NEWNET)))) {
+        get_nsproxy(old_ns);
+        return 0; }
+
+static inline void get_nsproxy(struct nsproxy *ns)
+    {
+        atomic_inc(&amp;ns-&gt;count);
+    }
+</code></pre>
+
+<p>If any is present, it creates a new nsproxy struct and copies all namespaces.</p>
+
+<pre><code class="c create_new_namespaces https://github.com/torvalds/linux/blob/603ba7e41bf5d405aba22294af5d075d8898176d/kernel/nsproxy.c">    new_nsp = create_nsproxy();
+    new_nsp-&gt;mnt_ns = copy_mnt_ns(flags, tsk-&gt;nsproxy-&gt;mnt_ns, user_ns, new_fs);
+    new_nsp-&gt;uts_ns = copy_utsname(flags, user_ns, tsk-&gt;nsproxy-&gt;uts_ns);
+    new_nsp-&gt;ipc_ns = copy_ipcs(flags, user_ns, tsk-&gt;nsproxy-&gt;ipc_ns);
+    new_nsp-&gt;pid_ns_for_children = copy_pid_ns(flags, user_ns, tsk-&gt;nsproxy-&gt;pid_ns_for_children);
+    new_nsp-&gt;net_ns = copy_net_ns(flags, user_ns, tsk-&gt;nsproxy-&gt;net_ns);
+
+    return new_nsp;
+</code></pre>
+
+<p>Child process is responsible for changing any namespace data.
+<code>c
+sethostname(hostname, strlen(hostname);
+</code></p>
+
+<p><code>unshare()</code> system call allows a process to disassociate parts of its execution context that are currently being shared with other processes.</p>
+
+<p>It allows to control shared execution context without creating a new process.</p>
+
+<pre><code class="c ">SYSCALL_DEFINE1(unshare, unsigned long, unshare_flags)
+{
+    err = unshare_fs(unshare_flags, &amp;new_fs);
+    err = unshare_fd(unshare_flags, &amp;new_fd);
+    err = unshare_userns(unshare_flags, &amp;new_cred);
+    err = unshare_nsproxy_namespaces(unshare_flags, &amp;new_nsproxy, new_cred, new_fs);
+</code></pre>
+
+<p>Flags like <code>CLONE_NEW*</code> flags have same effect as they have in <code>clone()</code>. All others ones that <code>unshare()</code> accepts has reverse effect. Since they were copied in above <code>create_new_namespaces</code> example.</p>
+
+<p>When a task ends, all namespaces they belong to that does not have any other process attached are cleaned. This means, mounts unmounted, network interfaced destroyed, etc.</p>
+
+<pre><code class="c put_nsproxy https://github.com/torvalds/linux/blob/master/include/linux/nsproxy.h">static inline void put_nsproxy(struct nsproxy *ns)
+{
+    if (atomic_dec_and_test(&amp;ns-&gt;count)) {
+        free_nsproxy(ns);
+    }
+}
+</code></pre>
+
+<p>Last API function to comment is <code>setns()</code> that simply allows a process to join an existing namespace.</p>
+
+<pre><code class="c setns https://github.com/torvalds/linux/blob/603ba7e41bf5d405aba22294af5d075d8898176d/kernel/nsproxy.c">SYSCALL_DEFINE2(setns, int, fd, int, nstype)
+{
+    file = proc_ns_fget(fd);
+    ns = get_proc_ns(file_inode(file));
+    new_nsproxy = create_new_namespaces(0, tsk, current_user_ns(), tsk-&gt;fs);
+    err = ns-&gt;ops-&gt;install(new_nsproxy, ns);
+
+    switch_task_namespaces(tsk, new_nsproxy);
+</code></pre>
+
+<p>fd argument specifies the namespace to join. It is translated to a nscommon struct calling <code>get_proc_ns(file_inode(file))</code>. We will cover fds in next point.</p>
+
+<pre><code class="c">define get_proc_ns(inode) ((struct ns_common *)(inode)-&gt;i_private)
+</code></pre>
+
+<h2>Namespaces in /proc</h2>
+
+<p>Per process namespaces can be found under <code>/proc/$pid/ns</code>.</p>
+
+<pre><code class="sh ">$ ls -l /proc/$$/ns
+total 0
+lrwxrwxrwx 1 ubuntu ubuntu 0 Jan  5 21:12 ipc -&gt; ipc:[4026531839]
+lrwxrwxrwx 1 ubuntu ubuntu 0 Jan  5 21:12 mnt -&gt; mnt:[4026531840]
+lrwxrwxrwx 1 ubuntu ubuntu 0 Jan  5 21:12 net -&gt; net:[4026531962]
+lrwxrwxrwx 1 ubuntu ubuntu 0 Jan  5 21:12 pid -&gt; pid:[4026531836]
+lrwxrwxrwx 1 ubuntu ubuntu 0 Jan  5 21:12 user -&gt; user:[4026531837]
+lrwxrwxrwx 1 ubuntu ubuntu 0 Jan  5 21:12 uts -&gt; uts:[4026531838]
+</code></pre>
+
+<p>Each process namespace has an inode number, that corresponds with a namespace struct. If two tasks share same number, they belongs to same namespace. Inode for ns files in namespaces is not the same as <code>stat -c %i</code> shows. They are sym links.
+For namespaces, like sockets or pipes inode number is shown in form <code>type:[inode]</code>.</p>
+
+<pre><code class="sh"># for pid in 643 23681 32178 ; do readlink /proc/$pid/ns/mnt ; done
+mnt:[4026531840]
+mnt:[4026532430]
+mnt:[4026532430]
+# for pid in 643 23681 32178 ; do md5sum /proc/$pid/mounts ; done
+8dddf7d919672a56849bb487840b94e0  /proc/643/mounts
+70159c37e8c8f16c61ceaa047ad9528a  /proc/23681/mounts
+70159c37e8c8f16c61ceaa047ad9528a  /proc/32178/mounts
+# unshare -m /bin/bash 
+# readlink /proc/$$/ns/mnt
+mnt:[4026532493]
+# for pid in  643 23681 32178; do stat -c %i /proc/$pid/ns/mnt ; done
+1308868
+1308731
+1308686
+</code></pre>
+
+<p><br>
+There are availabe two commands that correspond to each system call (like most of the shell commands that are just called like any system call). <code>unshare</code> for <code>unshare()</code> and <code>nsenter</code> for <code>setns()</code>.</p>
+]]></content>
+  </entry>
+  
+  <entry>
     <title type="html"><![CDATA[LibContainer Overview]]></title>
     <link href="http://jancorg.github.io/blog/2015/01/03/libcontainer-overview/"/>
     <updated>2015-01-03T18:14:14+01:00</updated>
     <id>http://jancorg.github.io/blog/2015/01/03/libcontainer-overview</id>
     <content type="html"><![CDATA[<p>Libcontainer is now the default docker execution environment. It is driver (named native) and a library.</p>
 
-<p>Or in other words, it is a replacement (since version 0.9) for formerly LXC execution environment (that can be easily brought back using <code>-e</code> switch).</p>
+<p>In other words, it is a replacement (since version 0.9) for formerly LXC execution environment (that can be easily brought back using <code>-e</code> switch).</p>
 
 <p>This library is developed by docker.io, written in go and C/C++, in order to support a wider range of isolation technologies. It also can be used in python through python bindings.</p>
 
@@ -28,7 +268,7 @@
 
 <p>It is meant to be a cross-system abstraction layer being an attempt to standarize the way apps are packed up, delivered, and run in isolation.</p>
 
-<p>Libcontainer as a stand alone project, makes possible to other game players to adopting it. Google, parallels (openvz), redhat, ubuntu (lxc). are also contributing to this project.</p>
+<p>Libcontainer as a stand alone project, makes possible to other game players adopting it. Google, parallels (openvz), redhat, ubuntu (lxc) are also contributing to this project.</p>
 
 <p><img src="http://1.bp.blogspot.com/-sxNaakTEBlg/U6Bbtglx00I/AAAAAAAAAcw/xgreTVZP4F4/s1600/libcontainer+intro.png" alt="libcontainer_place" /></p>
 
@@ -95,7 +335,7 @@ import (
 
 <p>Unfortunately, FreeBSD (and others flavours) mention on docker &amp; libcontainer are only for go language.</p>
 
-<p>A full list of OS level virtualization implementations can be found  on <a href="http://en.wikipedia.org/wiki/Operating_system%E2%80%93level_virtualization#Implementations">wikipedia</a></p>
+<p>A full list of OS level virtualization implementations can be found  on <a href="http://en.wikipedia.org/wiki/Operating_system%E2%80%93level_virtualization#Implementations">wikipedia</a>.</p>
 ]]></content>
   </entry>
   
@@ -106,7 +346,7 @@ import (
     <id>http://jancorg.github.io/blog/2015/01/02/hubot-a-bot-for-automating-daily-tasks-or-anything-else</id>
     <content type="html"><![CDATA[<blockquote><p>Hubot is your company&rsquo;s robot. Install him in your company to dramatically improve and reduce employee efficiency.</p></blockquote>
 
-<p>In other words, <a href="https://hubot.github.com/">hubot</a> is a chat bot crafted by github team that can run custom written scritps. This allow us to automatize any kind of tasks like merging branchs, deploying releases, do monitoring queries, inform (it listen on a port), etc. It has a lot of adapters (where it reads from and writes to), even shell, so we can enjoy its company almost everywhere.</p>
+<p>In other words, <a href="https://hubot.github.com/">hubot</a> is a chat bot crafted by github team that can run custom written scritps. This allow us to automatize any kind of tasks like merging branches, deploying releases, do monitoring queries, inform (it listen on a port), etc. It has a lot of adapters (where it reads from and writes to), even shell, so we can enjoy its company almost everywhere.</p>
 
 <p>It is written in <a href="http://coffeescript.org/">coffescript</a> and ran with nodejs.</p>
 
@@ -129,7 +369,7 @@ RUN chown marvin /home/marvin/.profile
 USER marvin
 WORDIR /home/marvin
 RUN echo n | yo hubot --defaults
-RUN npm installº hubot-slack hubot-scripts githubot --save
+RUN npm install hubot-slack hubot-scripts githubot --save
 
 # enable plugins
 RUN echo [ \'github-merge.coffee\' ] &gt; hubot-scripts.json
@@ -171,7 +411,7 @@ marvin&gt; marvin: the rules
 <h2>Github integration</h2>
 
 <p>One of the things I found interesting using hubot for is easy merging and deploy process.
-In this article I am just going to treat merging as as example, but concepts shown here could be easily used for integrating it with jenkins or any other tools.</p>
+In this article I am just going to treat merging as an example, but concepts shown here could be easily used for integrating it with jenkins or any other tools.</p>
 
 <p>We can find some git related scripts under scripts folder in <a href="https://github.com/github/hubot-scripts">hubot-scripts</a> github project.
 This time I have tested <a href="https://github.com/github/hubot-scripts/blob/master/src/scripts/github-merge.coffee">github-merge.coffee</a> plugin. It uses <a href="https://github.com/iangreenleaf/githubot">githubot</a> project for github API access.</p>
@@ -270,11 +510,15 @@ export HUBOT_SLACK_TOKEN=$slack_token
 } kernel_cap_t;
 </code></pre>
 
-<p>There are four sets of capabilities:
-- effective: capabilities that a process is allowed.
-- permitted: capabilities that a process is permited. This allows to enable, disable or drop capabilities.
-- inheritable: capabilities that a process can give to another process called, for instance, by calling <code>exec()</code> system call.
-- bounding set: Limit from capabilities can not be grown. They just can be dropped.</p>
+<p>There are four sets of capabilities:</p>
+
+<ul>
+<li><strong>effective</strong>: capabilities that a process is allowed.</li>
+<li><strong>permitted</strong>: capabilities that a process is permited. This allows to enable, disable or drop capabilities.</li>
+<li><strong>inheritable</strong>: capabilities that a process can give to another process called, for instance, by calling <code>exec()</code> system call.</li>
+<li><strong>bounding set</strong>: Limit from capabilities can not be grown. They just can be dropped.</li>
+</ul>
+
 
 <p>Credentials, therefore, are mostly a set of uids/guis, management flags, capabilities, namaspaces and cgroups.</p>
 

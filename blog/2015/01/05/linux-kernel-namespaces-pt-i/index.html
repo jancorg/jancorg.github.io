@@ -394,7 +394,7 @@ I let individual namespaces explanations as simple as this, or in other words, f
 
 <h2>Namespaces in /proc</h2>
 
-<p>Per process namespaces can be found under <code>/proc/PID/ns</code>.</p>
+<p>Per process namespaces can be found under <code>/proc/$pid/ns</code>.</p>
 
 <figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -415,7 +415,8 @@ I let individual namespaces explanations as simple as this, or in other words, f
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>Each process namespace has an id number, that corresponds with a namespace struct. If two tasks share same number, they belongs to same namespace. Inode for ns files in namespaces is not the same as <code>stat -c %i</code> shows. They are sym links.</p>
+<p>Each process namespace has an inode number, that corresponds with a namespace struct. If two tasks share same number, they belongs to same namespace. Inode for ns files in namespaces is not the same as <code>stat -c %i</code> shows. They are sym links.
+For namespaces, like sockets or pipes inode number is shown in form <code>type:[inode]</code>.</p>
 
 <figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -469,6 +470,12 @@ There are availabe two commands that correspond to each system call (like most o
 
 <time class='entry-date' datetime='2015-01-05T20:03:42+01:00'><span class='date'><span class='date-month'>Jan</span> <span class='date-day'>5</span><span class='date-suffix'>th</span>, <span class='date-year'>2015</span></span> <span class='time'>8:03 pm</span></time>
       
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/devops/'>devops</a>, <a class='category' href='/blog/categories/kernel/'>kernel</a>, <a class='category' href='/blog/categories/linux/'>linux</a>, <a class='category' href='/blog/categories/namespaces/'>namespaces</a>
+  
+</span>
 
 
     </p>

@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Docker | I left my leg in Jaglan Beta]]></title>
   <link href="http://jancorg.github.io/blog/categories/docker/atom.xml" rel="self"/>
   <link href="http://jancorg.github.io/"/>
-  <updated>2015-01-05T23:50:30+01:00</updated>
+  <updated>2015-01-06T02:53:59+01:00</updated>
   <id>http://jancorg.github.io/</id>
   <author>
     <name><![CDATA[jancorg]]></name>
@@ -20,7 +20,7 @@
     <id>http://jancorg.github.io/blog/2015/01/03/libcontainer-overview</id>
     <content type="html"><![CDATA[<p>Libcontainer is now the default docker execution environment. It is driver (named native) and a library.</p>
 
-<p>Or in other words, it is a replacement (since version 0.9) for formerly LXC execution environment (that can be easily brought back using <code>-e</code> switch).</p>
+<p>In other words, it is a replacement (since version 0.9) for formerly LXC execution environment (that can be easily brought back using <code>-e</code> switch).</p>
 
 <p>This library is developed by docker.io, written in go and C/C++, in order to support a wider range of isolation technologies. It also can be used in python through python bindings.</p>
 
@@ -28,7 +28,7 @@
 
 <p>It is meant to be a cross-system abstraction layer being an attempt to standarize the way apps are packed up, delivered, and run in isolation.</p>
 
-<p>Libcontainer as a stand alone project, makes possible to other game players to adopting it. Google, parallels (openvz), redhat, ubuntu (lxc). are also contributing to this project.</p>
+<p>Libcontainer as a stand alone project, makes possible to other game players adopting it. Google, parallels (openvz), redhat, ubuntu (lxc) are also contributing to this project.</p>
 
 <p><img src="http://1.bp.blogspot.com/-sxNaakTEBlg/U6Bbtglx00I/AAAAAAAAAcw/xgreTVZP4F4/s1600/libcontainer+intro.png" alt="libcontainer_place" /></p>
 
@@ -95,7 +95,7 @@ import (
 
 <p>Unfortunately, FreeBSD (and others flavours) mention on docker &amp; libcontainer are only for go language.</p>
 
-<p>A full list of OS level virtualization implementations can be found  on <a href="http://en.wikipedia.org/wiki/Operating_system%E2%80%93level_virtualization#Implementations">wikipedia</a></p>
+<p>A full list of OS level virtualization implementations can be found  on <a href="http://en.wikipedia.org/wiki/Operating_system%E2%80%93level_virtualization#Implementations">wikipedia</a>.</p>
 ]]></content>
   </entry>
   
@@ -106,7 +106,7 @@ import (
     <id>http://jancorg.github.io/blog/2015/01/02/hubot-a-bot-for-automating-daily-tasks-or-anything-else</id>
     <content type="html"><![CDATA[<blockquote><p>Hubot is your company&rsquo;s robot. Install him in your company to dramatically improve and reduce employee efficiency.</p></blockquote>
 
-<p>In other words, <a href="https://hubot.github.com/">hubot</a> is a chat bot crafted by github team that can run custom written scritps. This allow us to automatize any kind of tasks like merging branchs, deploying releases, do monitoring queries, inform (it listen on a port), etc. It has a lot of adapters (where it reads from and writes to), even shell, so we can enjoy its company almost everywhere.</p>
+<p>In other words, <a href="https://hubot.github.com/">hubot</a> is a chat bot crafted by github team that can run custom written scritps. This allow us to automatize any kind of tasks like merging branches, deploying releases, do monitoring queries, inform (it listen on a port), etc. It has a lot of adapters (where it reads from and writes to), even shell, so we can enjoy its company almost everywhere.</p>
 
 <p>It is written in <a href="http://coffeescript.org/">coffescript</a> and ran with nodejs.</p>
 
@@ -129,7 +129,7 @@ RUN chown marvin /home/marvin/.profile
 USER marvin
 WORDIR /home/marvin
 RUN echo n | yo hubot --defaults
-RUN npm installº hubot-slack hubot-scripts githubot --save
+RUN npm install hubot-slack hubot-scripts githubot --save
 
 # enable plugins
 RUN echo [ \'github-merge.coffee\' ] &gt; hubot-scripts.json
@@ -171,7 +171,7 @@ marvin&gt; marvin: the rules
 <h2>Github integration</h2>
 
 <p>One of the things I found interesting using hubot for is easy merging and deploy process.
-In this article I am just going to treat merging as as example, but concepts shown here could be easily used for integrating it with jenkins or any other tools.</p>
+In this article I am just going to treat merging as an example, but concepts shown here could be easily used for integrating it with jenkins or any other tools.</p>
 
 <p>We can find some git related scripts under scripts folder in <a href="https://github.com/github/hubot-scripts">hubot-scripts</a> github project.
 This time I have tested <a href="https://github.com/github/hubot-scripts/blob/master/src/scripts/github-merge.coffee">github-merge.coffee</a> plugin. It uses <a href="https://github.com/iangreenleaf/githubot">githubot</a> project for github API access.</p>
