@@ -9,7 +9,7 @@ categories: [ hubot, devops, chatops, git, slack, docker ]
 
 > Hubot is your company's robot. Install him in your company to dramatically improve and reduce employee efficiency.
 
-In other words, [hubot](https://hubot.github.com/) is a chat bot crafted by github team that can run custom written scritps. This allow us to automatize any kind of tasks like merging branchs, deploying releases, do monitoring queries, inform (it listen on a port), etc. It has a lot of adapters (where it reads from and writes to), even shell, so we can enjoy its company almost everywhere.
+In other words, [hubot](https://hubot.github.com/) is a chat bot crafted by github team that can run custom written scritps. This allow us to automatize any kind of tasks like merging branches, deploying releases, do monitoring queries, inform (it listen on a port), etc. It has a lot of adapters (where it reads from and writes to), even shell, so we can enjoy its company almost everywhere.
 
 It is written in [coffescript](http://coffeescript.org/) and ran with nodejs.
 
@@ -33,7 +33,7 @@ RUN chown marvin /home/marvin/.profile
 USER marvin
 WORDIR /home/marvin
 RUN echo n | yo hubot --defaults
-RUN npm installº hubot-slack hubot-scripts githubot --save
+RUN npm install hubot-slack hubot-scripts githubot --save
  
 # enable plugins
 RUN echo [ \'github-merge.coffee\' ] > hubot-scripts.json
@@ -75,7 +75,7 @@ marvin> marvin: the rules
 ## Github integration
 
 One of the things I found interesting using hubot for is easy merging and deploy process.
-In this article I am just going to treat merging as as example, but concepts shown here could be easily used for integrating it with jenkins or any other tools.
+In this article I am just going to treat merging as an example, but concepts shown here could be easily used for integrating it with jenkins or any other tools.
 
 We can find some git related scripts under scripts folder in [hubot-scripts](https://github.com/github/hubot-scripts) github project. 
 This time I have tested [github-merge.coffee](https://github.com/github/hubot-scripts/blob/master/src/scripts/github-merge.coffee) plugin. It uses [githubot](https://github.com/iangreenleaf/githubot) project for github API access.

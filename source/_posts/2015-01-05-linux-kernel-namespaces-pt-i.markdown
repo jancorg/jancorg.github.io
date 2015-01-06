@@ -3,14 +3,14 @@ layout: post
 title: "Linux Kernel Namespaces pt I"
 date: 2015-01-05 20:03:42 +0100
 comments: true
-categories: 
+categories: [ devops, namespaces, kernel, linux ]
 ---
 
 
 
-Namespaces are used to provide a process or a group of process with the idea of being the only process or group of processes in the system.
+Namespaces are used to provide a process or a group of processes with the idea of being the only process or group of processes in the system.
 
-They are a way to detach processes from a specific kernel layer assigning them to a new one. Or in other words, they are indirections layers for global resouces.
+They are a way to detach processes from a specific kernel layer assigning them to a new one. Or in other words, they are indirections layers for global resources.
 
 Lets imagine this as an extension to classical `chroot()` syscall. When setting a new root calling chroot, kernel was isolating new branch from existing one, and thus creating a new namespace for the process.
 
@@ -28,7 +28,7 @@ Currently, linux support following namespaces
  USER      | 3.8         | Uid, Guid,... 
 
 <br>
-I let individual namespaces explanations as simple as this , or in other words, for another day.
+I let individual namespaces explanations as simple as this, or in other words, for another day.
 
 
 ## Namespaces API
@@ -182,7 +182,7 @@ define get_proc_ns(inode) ((struct ns_common *)(inode)->i_private)
 
 ## Namespaces in /proc
 
-Per process namespaces can be found under `/proc/PID/ns`. 
+Per process namespaces can be found under `/proc/$pid/ns`. 
 
 ``` sh 
 $ ls -l /proc/$$/ns
@@ -195,7 +195,8 @@ lrwxrwxrwx 1 ubuntu ubuntu 0 Jan  5 21:12 user -> user:[4026531837]
 lrwxrwxrwx 1 ubuntu ubuntu 0 Jan  5 21:12 uts -> uts:[4026531838]
 ```
 
-Each process namespace has an id number, that corresponds with a namespace struct. If two tasks share same number, they belongs to same namespace. Inode for ns files in namespaces is not the same as `stat -c %i` shows.
+Each process namespace has an inode number, that corresponds with a namespace struct. If two tasks share same number, they belongs to same namespace. Inode for ns files in namespaces is not the same as `stat -c %i` shows. They are sym links.
+For namespaces, like sockets or pipes inode number is shown in form `type:[inode]`.
 
 ``` sh
 # for pid in 643 23681 32178 ; do readlink /proc/$pid/ns/mnt ; done

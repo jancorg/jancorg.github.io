@@ -44,10 +44,11 @@ struct cred init_cred = {
 ```
 
 There are four sets of capabilities:
-- effective: capabilities that a process is allowed.
-- permitted: capabilities that a process is permited. This allows to enable, disable or drop capabilities.
-- inheritable: capabilities that a process can give to another process called, for instance, by calling `exec()` system call.
-- bounding set: Limit from capabilities can not be grown. They just can be dropped. 
+
++ **effective**: capabilities that a process is allowed.
++ **permitted**: capabilities that a process is permited. This allows to enable, disable or drop capabilities.
++ **inheritable**: capabilities that a process can give to another process called, for instance, by calling `exec()` system call.
++ **bounding set**: Limit from capabilities can not be grown. They just can be dropped. 
 
 Credentials, therefore, are mostly a set of uids/guis, management flags, capabilities, namaspaces and cgroups.
 

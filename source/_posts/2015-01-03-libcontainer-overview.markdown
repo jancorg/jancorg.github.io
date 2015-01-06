@@ -10,7 +10,7 @@ categories: [ devops, libcontainer, docker ]
 
 Libcontainer is now the default docker execution environment. It is driver (named native) and a library. 
 
-Or in other words, it is a replacement (since version 0.9) for formerly LXC execution environment (that can be easily brought back using `-e` switch). 
+In other words, it is a replacement (since version 0.9) for formerly LXC execution environment (that can be easily brought back using `-e` switch). 
 
 This library is developed by docker.io, written in go and C/C++, in order to support a wider range of isolation technologies. It also can be used in python through python bindings.
 
@@ -18,7 +18,7 @@ This library is developed by docker.io, written in go and C/C++, in order to sup
 
 It is meant to be a cross-system abstraction layer being an attempt to standarize the way apps are packed up, delivered, and run in isolation.
 
-Libcontainer as a stand alone project, makes possible to other game players to adopting it. Google, parallels (openvz), redhat, ubuntu (lxc). are also contributing to this project.
+Libcontainer as a stand alone project, makes possible to other game players adopting it. Google, parallels (openvz), redhat, ubuntu (lxc) are also contributing to this project.
 
 ![libcontainer_place](http://1.bp.blogspot.com/-sxNaakTEBlg/U6Bbtglx00I/AAAAAAAAAcw/xgreTVZP4F4/s1600/libcontainer+intro.png)
 
@@ -94,4 +94,4 @@ Other systems, like FreeBSD, implements 'containers' using Jails. It is an older
 Unfortunately, FreeBSD (and others flavours) mention on docker & libcontainer are only for go language.
 
 
-A full list of OS level virtualization implementations can be found  on [wikipedia](http://en.wikipedia.org/wiki/Operating_system%E2%80%93level_virtualization#Implementations)
+A full list of OS level virtualization implementations can be found  on [wikipedia](http://en.wikipedia.org/wiki/Operating_system%E2%80%93level_virtualization#Implementations).
