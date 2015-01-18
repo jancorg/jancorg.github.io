@@ -215,5 +215,25 @@ mnt:[4026532493]
 1308731
 1308686
 ```
+
+Proc namespaces files are implemented through `proc_ns_operations` struct.
+
+``` c proc_ns_operations https://github.com/torvalds/linux/blob/master/include/linux/proc_ns.h
+struct proc_ns_operations {
+	const char *name;
+	int type;
+	struct ns_common *(*get)(struct task_struct *task);
+	void (*put)(struct ns_common *ns);
+	int (*install)(struct nsproxy *nsproxy, struct ns_common *ns);
+};
+
+extern const struct proc_ns_operations netns_operations;
+extern const struct proc_ns_operations utsns_operations;
+extern const struct proc_ns_operations ipcns_operations;
+extern const struct proc_ns_operations pidns_operations;
+extern const struct proc_ns_operations userns_operations;
+extern const struct proc_ns_operations mntns_operations;
+```
+
 <br>
 There are availabe two commands that correspond to each system call (like most of the shell commands that are just called like any system call). `unshare` for `unshare()` and `nsenter` for `setns()`.
