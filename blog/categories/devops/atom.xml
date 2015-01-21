@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Devops | I left my leg in Jaglan Beta]]></title>
   <link href="http://jancorg.github.io/blog/categories/devops/atom.xml" rel="self"/>
   <link href="http://jancorg.github.io/"/>
-  <updated>2015-01-06T02:53:59+01:00</updated>
+  <updated>2015-01-21T08:51:30+01:00</updated>
   <id>http://jancorg.github.io/</id>
   <author>
     <name><![CDATA[jancorg]]></name>
@@ -12,6 +12,59 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Docker Code Curiosities]]></title>
+    <link href="http://jancorg.github.io/blog/2015/01/21/docker-code-curiosities/"/>
+    <updated>2015-01-21T08:17:51+01:00</updated>
+    <id>http://jancorg.github.io/blog/2015/01/21/docker-code-curiosities</id>
+    <content type="html"><![CDATA[<p>Reading the code is the best documentation place at the end, and despites the fact that it is time consuming and sometimes hard to understand, it could make you happier sometimes.</p>
+
+<p>This post is about the unrelated things I found (for now) in docker code.</p>
+
+<h3>The meaning of life</h3>
+
+<p>Given the name of the blog, this one did not scape to my eyes&hellip;</p>
+
+<pre><code class="go meaning_of_life https://github.com/docker/docker/blob/master/engine/streams_test.go">func TestOutputAddEnv(t *testing.T) {
+    input := "{\"foo\": \"bar\", \"answer_to_life_the_universe_and_everything\": 42}"
+    o := NewOutput()
+    result, err := o.AddEnv()
+    if err != nil {
+        t.Fatal(err)
+    }
+    o.Write([]byte(input))
+    o.Close()
+    if v := result.Get("foo"); v != "bar" {
+        t.Errorf("Expected %v, got %v", "bar", v)
+    }
+    if v := result.GetInt("answer_to_life_the_universe_and_everything"); v != 42 {
+        t.Errorf("Expected %v, got %v", 42, v)
+    }
+    if v := result.Get("this-value-doesnt-exist"); v != "" {
+        t.Errorf("Expected %v, got %v", "", v)
+    }
+}
+</code></pre>
+
+<p>Remember, don&rsquo;t forget your towel!</p>
+
+<h3>Names generator</h3>
+
+<p>I enjoyed this wink, I mean, the whole file. It is worth to read it all, since all the names are quoted and this quick reference could wake up some interest about someone.</p>
+
+<pre><code class="go things_clear https://github.com/docker/docker/blob/master/pkg/namesgenerator/names-generator.go ">begin:
+    name := fmt.Sprintf("%s_%s", left[rand.Intn(len(left))], right[rand.Intn(len(right))])
+    if name == "boring_wozniak" /* Steve Wozniak is not boring */ {
+        goto begin
+    }
+</code></pre>
+
+<p>I have to say I agree.</p>
+
+<p>At least they are not as hard as the <a href="http://www.vidarholen.net/contents/wordcount/">ones</a> in linux code.</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Linux Kernel Namespaces Pt I]]></title>
@@ -246,6 +299,24 @@ mnt:[4026532493]
 1308868
 1308731
 1308686
+</code></pre>
+
+<p>Proc namespaces files are implemented through <code>proc_ns_operations</code> struct.</p>
+
+<pre><code class="c proc_ns_operations https://github.com/torvalds/linux/blob/master/include/linux/proc_ns.h">struct proc_ns_operations {
+    const char *name;
+    int type;
+    struct ns_common *(*get)(struct task_struct *task);
+    void (*put)(struct ns_common *ns);
+    int (*install)(struct nsproxy *nsproxy, struct ns_common *ns);
+};
+
+extern const struct proc_ns_operations netns_operations;
+extern const struct proc_ns_operations utsns_operations;
+extern const struct proc_ns_operations ipcns_operations;
+extern const struct proc_ns_operations pidns_operations;
+extern const struct proc_ns_operations userns_operations;
+extern const struct proc_ns_operations mntns_operations;
 </code></pre>
 
 <p><br>

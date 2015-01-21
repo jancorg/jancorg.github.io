@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Kernel | I left my leg in Jaglan Beta]]></title>
   <link href="http://jancorg.github.io/blog/categories/kernel/atom.xml" rel="self"/>
   <link href="http://jancorg.github.io/"/>
-  <updated>2015-01-06T02:53:59+01:00</updated>
+  <updated>2015-01-21T08:51:30+01:00</updated>
   <id>http://jancorg.github.io/</id>
   <author>
     <name><![CDATA[jancorg]]></name>
@@ -246,6 +246,24 @@ mnt:[4026532493]
 1308868
 1308731
 1308686
+</code></pre>
+
+<p>Proc namespaces files are implemented through <code>proc_ns_operations</code> struct.</p>
+
+<pre><code class="c proc_ns_operations https://github.com/torvalds/linux/blob/master/include/linux/proc_ns.h">struct proc_ns_operations {
+    const char *name;
+    int type;
+    struct ns_common *(*get)(struct task_struct *task);
+    void (*put)(struct ns_common *ns);
+    int (*install)(struct nsproxy *nsproxy, struct ns_common *ns);
+};
+
+extern const struct proc_ns_operations netns_operations;
+extern const struct proc_ns_operations utsns_operations;
+extern const struct proc_ns_operations ipcns_operations;
+extern const struct proc_ns_operations pidns_operations;
+extern const struct proc_ns_operations userns_operations;
+extern const struct proc_ns_operations mntns_operations;
 </code></pre>
 
 <p><br>

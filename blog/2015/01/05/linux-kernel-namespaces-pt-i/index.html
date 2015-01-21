@@ -451,6 +451,39 @@ For namespaces, like sockets or pipes inode number is shown in form <code>type:[
 </span></code></pre></td></tr></table></div></figure>
 
 
+<p>Proc namespaces files are implemented through <code>proc_ns_operations</code> struct.</p>
+
+<figure class='code'><figcaption><span>proc_ns_operations</span><a href='https://github.com/torvalds/linux/blob/master/include/linux/proc_ns.h'>link</a></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+</pre></td><td class='code'><pre><code class='c'><span class='line'><span class="k">struct</span> <span class="n">proc_ns_operations</span> <span class="p">{</span>
+</span><span class='line'>  <span class="k">const</span> <span class="kt">char</span> <span class="o">*</span><span class="n">name</span><span class="p">;</span>
+</span><span class='line'>  <span class="kt">int</span> <span class="n">type</span><span class="p">;</span>
+</span><span class='line'>  <span class="k">struct</span> <span class="n">ns_common</span> <span class="o">*</span><span class="p">(</span><span class="o">*</span><span class="n">get</span><span class="p">)(</span><span class="k">struct</span> <span class="n">task_struct</span> <span class="o">*</span><span class="n">task</span><span class="p">);</span>
+</span><span class='line'>  <span class="kt">void</span> <span class="p">(</span><span class="o">*</span><span class="n">put</span><span class="p">)(</span><span class="k">struct</span> <span class="n">ns_common</span> <span class="o">*</span><span class="n">ns</span><span class="p">);</span>
+</span><span class='line'>  <span class="kt">int</span> <span class="p">(</span><span class="o">*</span><span class="n">install</span><span class="p">)(</span><span class="k">struct</span> <span class="n">nsproxy</span> <span class="o">*</span><span class="n">nsproxy</span><span class="p">,</span> <span class="k">struct</span> <span class="n">ns_common</span> <span class="o">*</span><span class="n">ns</span><span class="p">);</span>
+</span><span class='line'><span class="p">};</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">extern</span> <span class="k">const</span> <span class="k">struct</span> <span class="n">proc_ns_operations</span> <span class="n">netns_operations</span><span class="p">;</span>
+</span><span class='line'><span class="k">extern</span> <span class="k">const</span> <span class="k">struct</span> <span class="n">proc_ns_operations</span> <span class="n">utsns_operations</span><span class="p">;</span>
+</span><span class='line'><span class="k">extern</span> <span class="k">const</span> <span class="k">struct</span> <span class="n">proc_ns_operations</span> <span class="n">ipcns_operations</span><span class="p">;</span>
+</span><span class='line'><span class="k">extern</span> <span class="k">const</span> <span class="k">struct</span> <span class="n">proc_ns_operations</span> <span class="n">pidns_operations</span><span class="p">;</span>
+</span><span class='line'><span class="k">extern</span> <span class="k">const</span> <span class="k">struct</span> <span class="n">proc_ns_operations</span> <span class="n">userns_operations</span><span class="p">;</span>
+</span><span class='line'><span class="k">extern</span> <span class="k">const</span> <span class="k">struct</span> <span class="n">proc_ns_operations</span> <span class="n">mntns_operations</span><span class="p">;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
 <p><br>
 There are availabe two commands that correspond to each system call (like most of the shell commands that are just called like any system call). <code>unshare</code> for <code>unshare()</code> and <code>nsenter</code> for <code>setns()</code>.</p>
 </div>
@@ -496,9 +529,17 @@ There are availabe two commands that correspond to each system call (like most o
         <a class="basic-alignment left" href="/blog/2015/01/03/libcontainer-overview/" title="Previous Post: LibContainer overview">&laquo; LibContainer overview</a>
       
       
+        <a class="basic-alignment right" href="/blog/2015/01/21/docker-code-curiosities/" title="Next Post: Docker code curiosities">Docker code curiosities &raquo;</a>
+      
     </p>
   </footer>
 </article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
 
 </div>
 
@@ -507,6 +548,10 @@ There are availabe two commands that correspond to each system call (like most o
     <section>
   <h1>Recent Posts</h1>
   <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2015/01/21/docker-code-curiosities/">Docker Code Curiosities</a>
+      </li>
     
       <li class="post">
         <a href="/blog/2015/01/05/linux-kernel-namespaces-pt-i/">Linux Kernel Namespaces Pt I</a>
@@ -544,6 +589,22 @@ There are availabe two commands that correspond to each system call (like most o
 
 </footer>
   
+
+<script type="text/javascript">
+      var disqus_shortname = 'jancorg';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://jancorg.github.io/blog/2015/01/05/linux-kernel-namespaces-pt-i/';
+        var disqus_url = 'http://jancorg.github.io/blog/2015/01/05/linux-kernel-namespaces-pt-i/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
 
 
 
