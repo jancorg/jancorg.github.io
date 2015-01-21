@@ -4,7 +4,7 @@
   <title><![CDATA[I left my leg in Jaglan Beta]]></title>
   <link href="http://jancorg.github.io/atom.xml" rel="self"/>
   <link href="http://jancorg.github.io/"/>
-  <updated>2015-01-21T08:51:30+01:00</updated>
+  <updated>2015-01-21T09:12:29+01:00</updated>
   <id>http://jancorg.github.io/</id>
   <author>
     <name><![CDATA[jancorg]]></name>
@@ -24,7 +24,7 @@
 
 <h3>The meaning of life</h3>
 
-<p>Given the name of the blog, this one did not scape to my eyes&hellip;</p>
+<p>Given the name of the blog, this one is not unnoticed to my eyes.</p>
 
 <figure class='code'><figcaption><span>meaning_of_life</span><a href='https://github.com/docker/docker/blob/master/engine/streams_test.go'>link</a></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>

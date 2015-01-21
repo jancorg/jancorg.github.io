@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Docker | I left my leg in Jaglan Beta]]></title>
   <link href="http://jancorg.github.io/blog/categories/docker/atom.xml" rel="self"/>
   <link href="http://jancorg.github.io/"/>
-  <updated>2015-01-21T08:51:30+01:00</updated>
+  <updated>2015-01-21T09:12:29+01:00</updated>
   <id>http://jancorg.github.io/</id>
   <author>
     <name><![CDATA[jancorg]]></name>
@@ -24,7 +24,7 @@
 
 <h3>The meaning of life</h3>
 
-<p>Given the name of the blog, this one did not scape to my eyes&hellip;</p>
+<p>Given the name of the blog, this one is not unnoticed to my eyes.</p>
 
 <pre><code class="go meaning_of_life https://github.com/docker/docker/blob/master/engine/streams_test.go">func TestOutputAddEnv(t *testing.T) {
     input := "{\"foo\": \"bar\", \"answer_to_life_the_universe_and_everything\": 42}"
