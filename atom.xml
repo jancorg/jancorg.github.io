@@ -4,7 +4,7 @@
   <title><![CDATA[I left my leg in Jaglan Beta]]></title>
   <link href="http://jancorg.github.io/atom.xml" rel="self"/>
   <link href="http://jancorg.github.io/"/>
-  <updated>2015-01-21T09:12:29+01:00</updated>
+  <updated>2015-01-24T19:21:18+01:00</updated>
   <id>http://jancorg.github.io/</id>
   <author>
     <name><![CDATA[jancorg]]></name>
@@ -18,7 +18,7 @@
     <link href="http://jancorg.github.io/blog/2015/01/21/docker-code-curiosities/"/>
     <updated>2015-01-21T08:17:51+01:00</updated>
     <id>http://jancorg.github.io/blog/2015/01/21/docker-code-curiosities</id>
-    <content type="html"><![CDATA[<p>Reading the code is the best documentation place at the end, and despites the fact that it is time consuming and sometimes hard to understand, it could make you happier sometimes.</p>
+    <content type="html"><![CDATA[<p>Code is the best documentation place at the end, and despites the fact that reading it is time consuming and hard to understand, sometimes it could make you happier.</p>
 
 <p>This post is about the unrelated things I found (for now) in docker code.</p>
 
